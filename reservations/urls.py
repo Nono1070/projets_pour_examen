@@ -12,5 +12,7 @@ urlpatterns = [
     path('artiste/create/', views.artist_create, name='artist_create'),
     path('artiste/edit/<int:id>/', views.artist_edit, name='artist_edit'),
     path('artiste/delete/<int:id>/', views.artist_delete, name='artist_delete'),
+    path('artistes/type/<str:type_name>/', views.artist_by_type, name='artist_by_type'),
+
     path('artist/<int:id>/', views.show_artist, name='show_artist'),
 ]
