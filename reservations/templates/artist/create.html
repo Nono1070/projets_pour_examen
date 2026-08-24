@@ -1,0 +1,18 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Ajouter un artiste{% endblock %}
+
+{% block content %}
+    <h2>Ajouter un artiste</h2>
+
+    <form action="{% url 'reservations:artist_create' %}" method="post">
+        {% csrf_token %}
+
+        {{ form }}
+
+        <button>Ajouter</button>
+        <a href="{% url 'reservations:artist_index' %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:artist_index' %}">Retour à l'index</a></nav>
+{% endblock %}

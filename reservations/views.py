@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
 from .models import Artist
+from .forms import ArtistForm
 
 # Create your views here.
 def index(request):
@@ -30,4 +31,18 @@ def show_artist(request, id):
 
     return render(request, 'artist/show.html', {
         'artist': artist,
+    })
+
+
+def artist_create(request):
+    form = ArtistForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+
+            return redirect('reservations:artist_index')
+
+    return render(request, 'artist/create.html', {
+        'form': form,
     })
