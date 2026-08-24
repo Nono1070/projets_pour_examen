@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Artist, Type, Locality, Location, Show
+from .models import Artist, Type, Locality, Location, Show, Representation, Review
 
 
 class ArtistForm(forms.ModelForm):
@@ -58,4 +58,26 @@ class ShowForm(forms.ModelForm):
             'location',
             'bookable',
             'price',
+        ]
+
+
+class RepresentationForm(forms.ModelForm):
+
+    class Meta:
+        model = Representation
+        fields = [
+            'show',
+            'schedule',
+            'location',
+        ]
+
+
+class ReviewForm(forms.ModelForm):
+
+    class Meta:
+        model = Review
+        fields = [
+            'show',
+            'review',
+            'stars',
         ]

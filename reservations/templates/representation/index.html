@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Liste des représentations{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:representation_create' %}">Ajouter</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Spectacle</th><th>Date</th><th>Lieu</th></tr>
+        </thead>
+        <tbody>
+        {% for representation in representations %}
+            <tr>
+                <td><a href="{% url 'reservations:show_representation' representation.id %}">{{ representation.show.title }}</a></td>
+                <td>{{ representation.schedule }}</td>
+                <td>{{ representation.location.designation|default:"lieu de création du spectacle" }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Aucune représentation dans la base de données.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -39,4 +39,17 @@ urlpatterns = [
     path('spectacle/edit/<int:id>/', views.show_edit, name='show_edit'),
     path('spectacle/delete/<int:id>/', views.show_delete, name='show_delete'),
     path('spectacle/<int:id>/', views.show_show, name='show_show'),
+
+    path('representations/', views.representation_index, name='representation_index'),
+    path('representation/create/', views.representation_create, name='representation_create'),
+    path('representation/edit/<int:id>/', views.representation_edit, name='representation_edit'),
+    path('representation/delete/<int:id>/', views.representation_delete, name='representation_delete'),
+    path('representation/<int:id>/', views.show_representation, name='show_representation'),
+
+    path('critiques/', views.review_index, name='review_index'),
+    path('critique/create/', views.review_create, name='review_create'),
+    path('critique/edit/<int:id>/', views.review_edit, name='review_edit'),
+    path('critique/delete/<int:id>/', views.review_delete, name='review_delete'),
+    path('critique/valider/<int:id>/', views.review_validate, name='review_validate'),
+    path('critique/<int:id>/', views.show_review, name='show_review'),
 ]

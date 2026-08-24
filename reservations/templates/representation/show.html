@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'une représentation{% endblock %}
+
+{% block content %}
+    <h2>{{ representation.show.title }}</h2>
+    <p>Date : {{ representation.schedule }}</p>
+    <p>
+        Lieu :
+        {% if representation.location %}
+            <a href="{% url 'reservations:show_location' representation.location.id %}">{{ representation.location.designation }}</a>
+        {% else %}
+            lieu de création du spectacle
+        {% endif %}
+    </p>
+
+    <div><a href="{% url 'reservations:representation_edit' representation.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:representation_delete' representation.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:representation_index' %}">Retour à l'index</a></nav>
+{% endblock %}

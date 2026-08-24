@@ -17,6 +17,26 @@
         {% endif %}
     </p>
 
+    <h3>Représentations</h3>
+    <ul>
+    {% for representation in show.representations.all %}
+        <li><a href="{% url 'reservations:show_representation' representation.id %}">{{ representation.schedule }}</a></li>
+    {% empty %}
+        <li>Aucune représentation programmée.</li>
+    {% endfor %}
+    </ul>
+
+    <h3>Critiques</h3>
+    <ul>
+    {% for review in show.reviews.all %}
+        {% if review.validated %}
+        <li><a href="{% url 'reservations:show_review' review.id %}">{{ review.user.username }} — {{ review.stars }} étoiles</a></li>
+        {% endif %}
+    {% empty %}
+        <li>Aucune critique pour le moment.</li>
+    {% endfor %}
+    </ul>
+
     <div><a href="{% url 'reservations:show_edit' show.id %}">Modifier</a></div>
 
     <form method="post" action="{% url 'reservations:show_delete' show.id %}"

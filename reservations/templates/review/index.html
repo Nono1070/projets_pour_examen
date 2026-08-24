@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Liste des critiques{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:review_create' %}">Ajouter une critique</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Spectacle</th><th>Auteur</th><th>Étoiles</th></tr>
+        </thead>
+        <tbody>
+        {% for review in reviews %}
+            <tr>
+                <td><a href="{% url 'reservations:show_review' review.id %}">{{ review.show.title }}</a></td>
+                <td>{{ review.user.username }}</td>
+                <td>{{ review.stars }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Aucune critique validée pour le moment.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

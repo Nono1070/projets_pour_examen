@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'une critique{% endblock %}
+
+{% block content %}
+    <h2>{{ review.show.title }} — {{ review.stars }} étoiles</h2>
+    <p>Par {{ review.user.username }}</p>
+    <p>{{ review.review }}</p>
+    <p>Statut : {{ review.validated|yesno:"validée,en attente de modération" }}</p>
+
+    {% if request.user == review.user %}
+    <div><a href="{% url 'reservations:review_edit' review.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:review_delete' review.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+    {% endif %}
+
+    {% if not review.validated and perms.reservations.change_review %}
+    <form method="post" action="{% url 'reservations:review_validate' review.id %}">
+        {% csrf_token %}
+        <button>Valider cette critique</button>
+    </form>
+    {% endif %}
+
+    <nav><a href="{% url 'reservations:review_index' %}">Retour à l'index</a></nav>
+{% endblock %}

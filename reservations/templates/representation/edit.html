@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Modifier une représentation{% endblock %}
+
+{% block content %}
+    <h2>Modifier une représentation</h2>
+
+    <form action="{% url 'reservations:representation_edit' representation.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="PUT">
+        {{ form }}
+        <button>Modifier</button>
+        <a href="{% url 'reservations:show_representation' representation.id %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:representation_index' %}">Retour à l'index</a></nav>
+{% endblock %}

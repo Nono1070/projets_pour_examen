@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Ajouter une critique{% endblock %}
+
+{% block content %}
+    <h2>Ajouter une critique</h2>
+
+    <form action="{% url 'reservations:review_create' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button>Envoyer</button>
+        <a href="{% url 'reservations:review_index' %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:review_index' %}">Retour à l'index</a></nav>
+{% endblock %}

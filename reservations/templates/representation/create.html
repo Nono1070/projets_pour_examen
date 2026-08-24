@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Ajouter une représentation{% endblock %}
+
+{% block content %}
+    <h2>Ajouter une représentation</h2>
+
+    <form action="{% url 'reservations:representation_create' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button>Ajouter</button>
+        <a href="{% url 'reservations:representation_index' %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:representation_index' %}">Retour à l'index</a></nav>
+{% endblock %}

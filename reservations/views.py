@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Artist, Type, Locality, Location, Show
-from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm
+from .models import Artist, Type, Locality, Location, Show, Representation, Review
+from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm
 
 # Create your views here.
 def index(request):
@@ -439,3 +439,182 @@ def show_delete(request, id):
     return render(request, 'show/show.html', {
         'show': show,
     })
+
+
+# --- Representation ---
+
+def representation_index(request):
+    representations = Representation.objects.all()
+
+    return render(request, 'representation/index.html', {
+        'representations': representations,
+        'title': 'Liste des représentations',
+    })
+
+
+def show_representation(request, id):
+    representation = get_object_or_404(Representation, id=id)
+
+    return render(request, 'representation/show.html', {
+        'representation': representation,
+    })
+
+
+@login_required
+def representation_create(request):
+    form = RepresentationForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Nouvelle représentation créée avec succès.")
+
+            return redirect('reservations:representation_index')
+        else:
+            messages.error(request, "Échec de l'ajout d'une nouvelle représentation !")
+
+    return render(request, 'representation/create.html', {
+        'form': form,
+    })
+
+
+@login_required
+def representation_edit(request, id):
+    representation = get_object_or_404(Representation, id=id)
+    form = RepresentationForm(request.POST or None, instance=representation)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'PUT':
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Représentation modifiée avec succès.")
+
+                return redirect('reservations:show_representation', id=representation.id)
+            else:
+                messages.error(request, "Échec de la modification de la représentation !")
+
+    return render(request, 'representation/edit.html', {
+        'form': form,
+        'representation': representation,
+    })
+
+
+@login_required
+@permission_required('reservations.delete_representation', raise_exception=True)
+def representation_delete(request, id):
+    representation = get_object_or_404(Representation, id=id)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'DELETE':
+            representation.delete()
+            messages.success(request, "Représentation supprimée avec succès.")
+
+            return redirect('reservations:representation_index')
+        else:
+            messages.error(request, "Échec de la suppression de la représentation !")
+
+    return render(request, 'representation/show.html', {
+        'representation': representation,
+    })
+
+
+# --- Review ---
+
+def review_index(request):
+    reviews = Review.objects.filter(validated=True)
+
+    return render(request, 'review/index.html', {
+        'reviews': reviews,
+        'title': 'Liste des critiques',
+    })
+
+
+def show_review(request, id):
+    review = get_object_or_404(Review, id=id)
+
+    return render(request, 'review/show.html', {
+        'review': review,
+    })
+
+
+@login_required
+def review_create(request):
+    form = ReviewForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.validated = False
+            review.save()
+            messages.success(request, "Critique envoyée avec succès, en attente de modération.")
+
+            return redirect('reservations:review_index')
+        else:
+            messages.error(request, "Échec de l'ajout de la critique !")
+
+    return render(request, 'review/create.html', {
+        'form': form,
+    })
+
+
+@login_required
+def review_edit(request, id):
+    review = get_object_or_404(Review, id=id, user=request.user)
+    form = ReviewForm(request.POST or None, instance=review)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'PUT':
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.validated = False
+                review.save()
+                messages.success(request, "Critique modifiée avec succès, en attente de nouvelle modération.")
+
+                return redirect('reservations:show_review', id=review.id)
+            else:
+                messages.error(request, "Échec de la modification de la critique !")
+
+    return render(request, 'review/edit.html', {
+        'form': form,
+        'review': review,
+    })
+
+
+@login_required
+def review_delete(request, id):
+    review = get_object_or_404(Review, id=id, user=request.user)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'DELETE':
+            review.delete()
+            messages.success(request, "Critique supprimée avec succès.")
+
+            return redirect('reservations:review_index')
+        else:
+            messages.error(request, "Échec de la suppression de la critique !")
+
+    return render(request, 'review/show.html', {
+        'review': review,
+    })
+
+
+@login_required
+@permission_required('reservations.change_review', raise_exception=True)
+def review_validate(request, id):
+    review = get_object_or_404(Review, id=id)
+
+    if request.method == 'POST':
+        review.validated = True
+        review.save()
+        messages.success(request, "Critique validée avec succès.")
+
+    return redirect('reservations:show_review', id=review.id)
