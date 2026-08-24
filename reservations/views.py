@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 
 from .models import Artist
 from .forms import ArtistForm
@@ -40,6 +41,7 @@ def show_artist(request, id):
     })
 
 
+@login_required
 def artist_create(request):
     form = ArtistForm(request.POST or None)
 
@@ -57,6 +59,7 @@ def artist_create(request):
     })
 
 
+@login_required
 def artist_edit(request, id):
     # on récupère l'objet correspondant à l'id passé dans l'URL
     artist = get_object_or_404(Artist, id=id)
@@ -82,6 +85,8 @@ def artist_edit(request, id):
     })
 
 
+@login_required
+@permission_required('reservations.delete_artist', raise_exception=True)
 def artist_delete(request, id):
     artist = get_object_or_404(Artist, id=id)
 
