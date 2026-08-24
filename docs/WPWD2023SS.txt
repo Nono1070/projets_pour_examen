@@ -1,0 +1,45 @@
+Projet Réservations – Cahier de charges additionnel
+F1 – Un utilisateur consulte la liste des langues parlées par un artiste de type comédien.
+A1 – Un administrateur ajoute une langue parlée par un artiste de type comédien.
+
+Installer et configurer le projet Réservations disponible sur GitHub :
+
+	https://github.com/cedryc-ruth/artist-Laravel9.git
+
+ou utilisez votre propre implémentation du projet.
+
+languages
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de la langueClé primairelanguageTexte court
+artist_language
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de l'association artist_langueClé primaireartist_idId de l'artisteClé étrangèrelanguage_idId de la langueClé étrangèrelevelEnumérationLangue maternelle, Débutant, Intermédiaire, Courant
+Partie Backend
+Dans la base de données reservations,
+- Ajoutez une table languages : liste des langues parlées par les artistes.
+- Liez la table languages à la table artists, sans oublier les contraintes d’intégrité référentielle, en tenant compte du fait que la table intermédiaire artist_language possède le champ supplémentaire level, qui correspond au niveau de maîtrise de la langue.
+Sachez qu’un artiste parle une ou plusieurs langues et qu’une langue peut être parlée par plusieurs artistes.
+
+Dans le framework,
+- Générez le ou les nouveaux modèles (entité)
+- Définissez et injectez des données de test (data fixtures, seeders,…)
+o Modifiez d'autres données de test si nécessaire
+- Définissez le mapping relationnel entre les différents modèles
+
+- Dans la fiche d'un artiste, si et seulement si l'artiste possède le type comédien
+o affichez la liste des langues parlées par l'artiste (langue et niveau de maîtrise),
+o ajoutez un formulaire d'ajout d’une langue visible et utilisable seulement par un administrateur connecté, de façon à
+* afficher une liste déroulante pour le choix de la langue,
+* empêcher le traitement si l’utilisateur n’est pas connecté en tant qu'administrateur.
+
+- Définissez une route personnalisée qui permet d'afficher les artistes qui parlent couramment une langue qui est donnée en paramètre.
+o Gérez le traitement de cette route (contrôleur, template).
+
+Veuillez remettre une archive du projet au format ZIP sans oublier d’y inclure le DUMP SQL de la base de données.
+
+Critères d’évaluation
+C2 - Reproduire individuellement plusieurs consignes pertinentes du cahier de charges
+1. Modifier l'application backend étudiée au cours de manière à ajouter une table, son jeu de données et son mapping relationnel
+2. Utiliser les générateurs pour créer l'entité, le contrôleur et les templates
+3. Personnaliser un template (liste des catégories avec les spectacles)
+4. Personnaliser un contrôleur (longueur catégorie et catégorie affectée par défaut)
+5. Personnaliser un formulaire (liste déroulante plutôt que zone de texte)
+6. Définir une route personnalisée et paramétrée

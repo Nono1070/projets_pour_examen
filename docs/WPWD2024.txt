@@ -1,0 +1,39 @@
+Projet Réservations – Cahier de charges additionnel
+F1 – Un utilisateur recherche des spectacles par mot-clé.
+A1 – Un administrateur ajoute un mot-clé pour un spectacle.
+
+Installer et configurer le projet Réservations, au départ de votre implémentation ou en vous basant sur le code disponible sur GitHub : https://github.com/cedryc-ruth 
+
+tags
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId du mot-cléClé primairetagTexte (30)Mot-cléUnique
+Partie Backend
+Définissez des migrations de façon à modifier la base de données reservations, sachant qu’un spectacle possède zéro ou plusieurs mots-clés (tags) et qu’un mot-clé référence zéro ou plusieurs spectacles (shows).
+Veillez à bien identifier le type de relation (one-to-many, many-to-many ou one-to-one).
+Veillez à définir les contraintes d’intégrité référentielle suivantes : appliquer la cascade en cas de mise à jour et empêcher en cas de suppression.
+
+Dans le framework,
+- Générez le nouveau modèle (l'entité) Tag
+- Définissez et injectez des données de test (data fixtures, seeders,…)
+- Définissez le mapping relationnel entre les différents modèles concernés 
+
+- Dans la page qui présente la liste des spectacles, 
+o ajoutez un moteur de recherche par mot-clé. Les résultat de recherche doivent s’afficher dans la même page en précisant le nombre total de résultats.
+
+- Dans la fiche d’un spectacle, 
+o affichez la liste des mots clés du spectacle,
+o ajoutez le formulaire d'ajout d’un mot-clé pour le spectacle (que seul l’administrateur pourra voir),
+o empêchez l’ajout d’un mot-clé si l’utilisateur n’est pas connecté en tant qu’administrateur.
+
+- Définissez une route personnalisée qui permet d'afficher les spectacles qui ne possèdent pas le mot-clé donné en paramètre.
+o Gérez le traitement de cette route (contrôleur, template).
+
+Veuillez remettre une archive du projet au format ZIP sans oublier d’y inclure le DUMP SQL de la base de données.
+
+Critères d’évaluation
+C2 - Reproduire individuellement plusieurs consignes pertinentes du cahier de charges
+1. Modifier l'application backend étudiée au cours de manière à ajouter une table, son jeu de données et son mapping relationnel
+2. Utiliser les générateurs pour créer l'entité, le contrôleur et les templates
+3. Personnaliser un template (liste des catégories avec les spectacles)
+4. Personnaliser un contrôleur (longueur catégorie et catégorie affectée par défaut)
+5. Personnaliser un formulaire (liste déroulante plutôt que zone de texte)
+6. Définir une route personnalisée et paramétrée

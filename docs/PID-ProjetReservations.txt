@@ -1,0 +1,426 @@
+PID – Projet Réservations
+Contexte
+Dans le cadre de la formation en Bachelier en Informatique de gestion, orientation développement d'applications, d’une part, et en BES de Web Developer, d’autre part, le présent projet s’inscrit dans une double finalité, à savoir :
+* se former au développement d’une application Web dynamique au moyen d’outils de développement RAD et en développant une méthodologie professionnelle dans un contexte de travail collaboratif (travail de groupe et support en classe) ;
+* se préparer au Travail de Fin d’Études en explorant les besoins fonctionnels du TFE dans un contexte moins contraignant, et en développant les compétences adéquates et son autonomie.
+Gestion du projet
+* https://openclassrooms.com/courses/4192086-gerez-votre-projet-informatique-facilement 
+* https://openclassrooms.com/courses/4296701-gerez-un-projet-digital-avec-une-methodologie-en-cascade 
+* https://openclassrooms.com/courses/4507926-initiez-vous-a-la-gestion-de-projet-agile 
+Itération 0 – Découverte du projet
+Introduction
+Présentation du projet
+Le projet consiste à informatiser la gestion des réservations de spectacles d’une société de production. Celle-ci gère un catalogue reprenant des spectacles, leurs auteurs et leurs metteurs en scènes, les comédiens, ainsi que les lieux et les dates de représentations.
+L’internaute pourra consulter librement le catalogue des spectacles affichant le lieu et les prochaines dates de représentation. Il pourra effectuer des recherches, des tris et des filtres à travers les pages du catalogue.
+Le membre pourra réserver des places pour une représentation d’un spectacle, consulter la liste de ses réservations, modifier ses données de profil et commenter les spectacles auxquels il a assisté.
+L’administrateur pourra gérer son catalogue à travers un back-office sécurisé. Par exemple, il pourra ajouter, modifier et supprimer un spectacle manuellement, importer/exporter des données au format CSV, mais aussi mettre à jour la liste des spectacles grâce aux nouveautés publiées par un Web service tiers.
+À son tour, l’application devra produire d’une part son propre Web service (une API authentifiée avec système d’affiliation), d’autre part un flux RSS (par exemple, la liste des prochaines représentations).
+L’affilié est un membre qui pourra se connecter à l’API et consommer les données du catalogue selon son niveau de privilège (Free, Starter et Premium).
+Le critique de presse est un membre qui pourra soumettre à publication un article critique à propos d’un spectacle.
+Le producteur est un membre qui pourra consulter des statistiques de vente des spectacles qu’il produit. Il pourra aussi modérer les commentaires et critiques de presse de ces spectacles.
+Cahier de charges techniques
+• Développer une application Web en respectant les contraintes suivantes
+• utiliser la programmation orientée objet (langages Java, PHP ou Python),
+• exploiter un framework (Spring Boot, Symfony, Laravel, CakePHP, Django),
+• gérer les erreurs de programmation au moyen d’outils ou de techniques de débogage et y apporter une solution pertinente,
+• utiliser à bon escient la documentation disponible,
+• optimisation du code, du cache et des échanges avec la base de données,
+• gérer un catalogue d’éléments (produits, membres ou services) :
+• effectuer des recherches dans le catalogue,
+• paginer, trier et filtrer les résultats de la requête,
+• sélectionner des éléments du catalogue et effectuer des actions groupées,
+• sélectionner un élément du catalogue et en afficher le détail,
+• gérer la sécurisation et les droits d’accès aux contenus (droits d’accès par rôle administrateur, utilisateur public, utilisateur enregistré, gestionnaire, etc.),
+• afficher des contenus de manière différenciée (accessibilité, langue, sécurité, fonctionnalités, disponibilité de l’information, etc.), en fonction des profils utilisateurs,
+• optimisé par programmation asynchrone (AJAX, JSON, XML,…),
+• exploiter des fichiers de données structurées (XML, CSV, texte,..) en lecture/écriture (importer/exporter le catalogue),
+• intégrer des services internes et tiers (RESTful Web services),
+• déployer un back-office d’administration (interface administrateur sécurisé) :
+• gérer les contenus dynamiques,
+• modifier ses données de profil,
+• configurer une interface utilisateur (couleur, affichage,…),
+• interagir avec un système de gestion de bases de données (récupérer, ajouter, modifier, supprimer des enregistrements, etc.) ;
+• Veiller à la sécurité
+• utiliser des outils spécifiques de protection et d’identification,
+• protéger l’application contre les injections SQL, attaques XSS, vols de session,  détournement de cookies, etc.,
+• définir la réécriture d’url,
+• configurer des paramétrages et restrictions d’accès au serveur.
+
+
+Données initiales
+Suite à une précédente tentative d’informatisation inaboutie, la société de production dispose déjà de l’export des données de l’ancienne application sous forme de fichier au format XML. Partant de ce fichier, elle souhaite que vous conceviez une base de données relationnelle.
+Extrait du fichier XML
+<?xml version="1.0" encoding="utf-8"?>
+<reservations>
+	<lieu id="delvaux">
+		<designation>Espace Delvaux / La Vénerie</designation>
+		<adresse>
+			<rue>3 rue Gratès</rue>
+			<localite>1170 Watermael-Boitsfort</localite>
+		</adresse>
+		<website></website>
+		<tel></tel>
+	</lieu>
+…
+	<spectacle id="ayiti" reservable="1">
+		<title>Ayiti</title>
+		<img src="/wrapped/imgs/ayiti.jpg" />
+		<auteur>Daniel Marcelin et Philippe Laurent</auteur>
+		<scenographie>Daniel Marcelin et Philippe Laurent</scenographie>
+		<distribution>Daniel Marcelin</distribution>
+		<lieu ref="delvaux" />
+		<representations>
+			<representation complet="1">
+				<date>12/10/2012</date>
+				<heure>13:30</heure>
+				<lieu ref="delvaux" />
+			</representation>
+			<representation>
+				<date>12/10/2012</date>
+				<heure>20:30</heure>
+				<lieu ref="dexia" />
+			</representation>
+		</representations>
+	</spectacle>
+…
+</reservations>
+
+
+
+Étude comparative
+Une analyse de la concurrence ou une étude comparative des applications qui existent déjà sur le marché permet de comprendre comment ce genre d’application fonctionne. La nouvelle application pourra bénéficier de l’analyse de leurs avantages et inconvénients, et se positionner par rapport au marché, quitte à proposer des améliorations ou des innovations originales. Les critères d’analyse peuvent porter sur le processus de la fonctionnalité elle-même, mais aussi la navigation, la gestion des erreurs, l’accessibilité, l’ergonomie, les technologies utilisées, etc.
+
+  
+
+
+Analyse1
+Diagramme de contexte
+
+
+Cas d’utilisation
+
+
+
+
+Schéma de base de données
+Plusieurs talents, des artistes et des techniciens (tables artists, types et artist_type) sont engagés (artist_type_show) en vue de la création d’un spectacle (shows) dans un lieu ou une salle de spectacle (locations).
+Les spectacles (shows) donnent lieu à des représentations (representations) dans le même lieu de création ou dans d’autres salles de spectacles (locations) que les membres (users) peuvent réserver (reservations) en indiquant le nombre de places souhaitées (representation_reservation) et en sélectionnant le tarif adéquat (prices).
+Les membres (users, user_role, roles) peuvent commenter (reviews) le spectacle (shows) auquel ils ont assisté. Tandis que les critiques de presse peuvent envoyer leurs articles critiques sous forme de texte ou de lien. Enfin, les producteurs pourront modérer les commentaires et publier les critiques de presse de ces spectacles.
+
+
+
+Diagramme de classes participantes
+TODO
+Règles métier
+* Interopérabilité
+* Risques
+* Sécurité
+Contraintes et règle métier
+L’étudiant devra justifier à travers la rédaction d’un rapport écrit qu’il a réalisé le présent projet en veillant à respecter les contraintes suivantes :
+• utiliser la programmation orientée objet (langages Java, PHP ou Python),
+• exploiter un framework backend (Spring Boot, Symfony, Laravel, CakePHP, Django),
+• exploiter un framework ou une librairie frontend (React, Angular, VueJS ou jQuery),
+• intégrer des services internes et tiers (RESTful Web services),
+• gérer les erreurs de programmation au moyen d’outils ou de techniques de débogage et y apporter une solution pertinente,
+• utiliser à bon escient la documentation disponible,
+• optimiser le code, le cache et les échanges avec la base de données,
+• Veiller à la sécurité des données et du système en général.
+Business model
+TODO
+Gains
+- Vente de billets en ligne pour les membres
+- Vente d’abonnements à notre API pour les affiliés
+- Ventes de produits dérivés pour les membres (affiches, t-shirts, catalogue, livres, goodies…)
+Coûts
+- Souscription au service de paiement
+- Abonnement au webservice Spectacles Provider
+- Maintenance
+Modalités
+L’objectif de cette itération doit permettre les éléments suivants :
+* appréhender les étapes d’un projet informatique complexe,
+* comprendre les enjeux de la phase d’analyse,
+* donner lieu à la réflexion, 
+* assurer la compréhension du contexte et des objectifs poursuivis,
+* offrir un espace de négociation du périmètre du projet,
+* intégrer les enjeux du business model.
+Planning
+L’itération 0 doit être effectuée en classe lors de la leçon 1. Elle ne fait pas l’objet d’une remise.
+
+
+Itération 1 – Installation du framework
+Introduction
+L’objectif de cette première itération consiste à effectuer les tâches suivantes :
+1. Installer et configurer les frameworks ;
+2. Utiliser des gestionnaires de dépendances pour organiser les librairies et composantes ;
+3. Utiliser et configurer un environnement de développement intégré ;
+4. Utiliser un logiciel de gestion des versions et configurer une solution d’hébergement ;
+5. Utiliser un logiciel de gestion de projet et définir l’organigramme des tâches.
+Modalités
+Vous devez implémenter l’application en utilisant au choix un des frameworks côté serveur basé sur le langage PHP, Java ou Python : Symfony, Laravel, CakePHP, Spring Boot ou Django. Côté client, la partie statique HTML/CSS sera facilitée par le framework Twitter Bootstrap ou TailwindCSS. Vous pouvez vous limiter à JavaScript avec ou sans la librairie jQuery. Toutefois, l’utilisation d’une librairie frontend telle que React.js, Angular ou Vue.js sera privilégiée. Notez qu’il existe aussi des solutions fullstack telles que Laravel/Livewire (PHP) ou Next.js (JavaScript).
+    
+            
+
+ 
+Planning
+L’itération 1 doit être effectuée en classe au terme de la leçon 1. Elle doit faire l’objet d’une remise sur le dépôt de versioning en ligne. Au cas où l’étudiant serait absent, l’itération 1 devra être effectuée à domicile en suivant les indications du tutoriel mentionné à l’itération 2.
+Mode d’évaluation
+L’étudiant a publié sur une plateforme d’hébergement l’ensemble des fichiers de son projet. Il a remis l’adresse de ce dépôt dans le travail adhoc sur la plateforme pédagogique.
+Critères évalués
+L’enseignant inspecte les fichiers du dépôt et constate qu’au moins le framework backend a été installé et configuré. Il note également la présence des fichiers de configuration des gestionnaires de dépendances (composer.json, package.json, pom.xml, requirements.txt…).
+Enfin, il inspecte le tableau de bord de la gestion de projet et constate la présence d’un début d’organisation des tâches futures.
+L’enseignant ne pourra pas évaluer l’utilisation d’un environnement de développement intégré. Ce critère sera validé lors des séances de cours en classe.
+Pénalités
+En cas de retard
+L’étudiant dispose d’un mois à compter du lancement du projet pour réaliser cette itération. Dans le cas contraire, l’étudiant sera considéré en abandon et ne pourra pas présenter la défense orale du projet.
+En cas de mauvaise qualité
+Si la qualité du travail est jugée insuffisante ou que le travail remis ne correspond pas aux consignes, l’étudiant dispose d’une semaine pour soumettre une version corrigée de son travail. Dans le cas contraire, cette étape du travail sera marquée comme « insuffisante » et ne sera plus réévaluée avant la défense orale. 
+Itération 2 – Prise en main du framework
+Introduction
+L’objectif de cette deuxième itération consiste à suivre un tutoriel simple qui permet de découvrir le workflow d’un développement avec framework. Il s’agit d’une mini-phase de formation : savoir suivre des instructions.
+Les tutoriels de cette itération sont nommés Starter Kit et sont disponibles sur la plateforme pédagogique dans un dossier distinct pour chaque framework.
+Modalités
+Vous devez suivre un tutoriel mettant en œuvre les activités suivantes :
+1. Installation et configuration du framework,
+2. Mapping relationnel simple d’une entité,
+3. Implémentation de deux templates simples de type liste des données et fiche d’une donnée,
+4. Implémentation du contrôleur correspond et des actions CRUD de base (index, show).
+Références
+Le tutoriel à suivre est un roadmap intitulé Starter Kit (chapitres 1 à 2).
+Si vous désirez suivre une autre approche, voici une liste non exhaustive de tutoriels classés par langage :
+* PHP
+o Symfony
+* https://symfony.com/blog/introducing-the-symfony-demo-application (Demo Application)
+o Laravel
+* https://laracasts.com/series/laravel-from-scratch-2017 
+(Laracasts « Laravel from scratch »)
+* Spark
+* https://spark.laravel.com/docs/5.0/quickstart 
+o CakePhp
+* https://book.cakephp.org/5/fr/tutorials-and-examples.html (CMS)
+* Java
+o SpringBoot
+* https://spring.io/guides/gs/spring-boot/ 
+* Python
+o Django
+* https://docs.djangoproject.com/fr/5.1/#index-first-steps (prise en main)
+* https://docs.djangoproject.com/fr/5.1/intro/ (tutoriel complet)
+Planning
+L’itération 2 doit être effectuée de préférence en classe lors de la leçon 2, sinon à domicile. Elle doit faire l’objet d’une remise sur le dépôt de versioning en ligne.
+
+
+Itération 3 – Mapping relationnel et opérations CRUD simples
+Introduction
+L’objectif de cette troisième itération consiste à vous inspirer du tutoriel précédent et suivre en parallèle un autre support tel que la documentation officielle du framework afin d’approfondir les notions. Il s’agit d’une mini-phase de travail sur l’autonomie : savoir transposer et adapter les instructions à un nouveau cas.
+Les notions abordées seront :
+* Le mapping relationnel simple d’une entité sans faire de relation avec d’autres ;
+* L’implémentation des opérations CRUD de base ;
+* La gestion des formulaires et la validation des données ;
+* La sécurité des applications Web.
+Dans une application Web les formulaires permettent d’ajouter et de modifier des données. Cependant, il faut veiller à la validité des nouvelles données fournies par l’utilisateur pour des raisons à la fois de sécurité mais aussi d’intégrité et de cohérence des données stockées.
+Modalités
+Veuillez mettre en œuvre les fonctionnalités suivantes :
+1. Réaliser le mapping Objet-Relationnel d’une table sans clé étrangère de la base de données conformément au schéma de base de données et à la syntaxe de l’ORM proposé par le framework ;
+a. Générer et personnaliser l’entité ou modèle ;
+b. Générer et personnaliser les jeux de données (fixtures/seeder).
+2. Implémenter, en utilisant la syntaxe du moteur de template, les templates de type 
+a. « liste de produits » (afficher tous les produits),
+b. « fiche produit » (afficher un seul produit avec tous les détails),
+c. « formulaire nouveau produit »,
+d. « formulaire modifier un produit »,
+e. « formulaire supprimer un produit » (fragment dans la page fiche produit) ;
+3. Implémenter dans un contrôleur les méthodes chargées
+a. d’extraire les produits de la table et les afficher dans le template de type liste ;
+b. d’extraire un produit précis de la table et l’afficher dans le template de type fiche ;
+c. de récupérer, valider les données de formulaire, créer un nouveau produit et l’insérer dans la base de données,
+d. de récupérer, valider les données de formulaire, modifier un produit précis et le mettre à jour dans la base de données,
+e. de supprimer un produit précis dans la base de données ;
+4. Définir les routes permettant d’exécuter les opérations CRUD de base (index, show, save, delete, update).
+Références
+Le tutoriel à suivre et adapter est le roadmap intitulé Starter Kit (chapitre 2), ainsi que le roadmap intitulé Backend Kit (chapitre 4).
+Routage des requêtes
+Nom de la routeURLMéthodeDescriptionartist.index/artist/GETAffiche tous les artistesartist.show/artist/{id}GETAffiche l’artiste dont l’id est fourni dans l’URLartist.create/artist/createGETAffiche un formulaire videartist.store/artist/POSTPersiste les données du formulaire dans la BDartist.edit/artist/edit/{id}GETAffiche un formulaire rempli des données de l’artiste dont l’id est fourni dans l’URLartist.update/artist/PUTPersiste les données du formulaire dans la BDartist.delete/artist/{id}DELETESupprime de la BD l’artiste dont l’id est fourni dans l’URL
+Dictionnaire de données
+artists
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULIdEntier longId de l’artisteClé primairefirstnameTexte (60)Prénom de l’artistelastnameTexte (60)Nom de l’artiste
+types
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId du typeClé primairetypeTexte (60)Fonction de l’artiste (métier)Planning
+L’itération 3 doit faire l’objet d’une remise sur le dépôt de versioning en ligne. Elle peut entièrement être réalisée à domicile.
+
+
+Itération 4 –Authentification
+Cette itération regroupe plusieurs problématiques liées au principe d’authentification :
+* L’inscription des membres,
+* La connexion et la déconnexion,
+* La récupération du mot de passe,
+* L’autorisation d’accès à une ressource ou une fonctionnalité en fonction du rôle d’un membre.
+Références
+Le tutoriel à suivre et adapter est le roadmap intitulé Starter Kit (chapitre 3).
+Modalités
+Pour cette itération, il est demandé d’utiliser le composant adéquat du framework afin d’optimiser le développement en respectant les bonnes pratiques et les contraintes de sécurité.
+Planning
+L’itération 4 doit faire l’objet d’une remise sur le dépôt de versioning en ligne.
+
+
+Itération 5 – Mapping relationnel et opérations CRUD complexes
+Introduction
+L’objectif de cette quatrième itération consiste à ajouter les fonctionnalités suivantes :
+5. Réaliser le mapping Objet-Relationnel d’une table avec clé étrangère en relation One-To-Many et Many-To-Many conformément au schéma de base de données et à la syntaxe de l’ORM proposé par le framework ;
+a. Modifier une entité prédéfinie ;
+b. Générer et personnaliser l’entité ;
+c. Générer et personnaliser les jeux de données (fixtures/seeder).
+6. Implémenter, en utilisant la syntaxe du moteur de template, un template de type 
+a. « fiche produit » (afficher en détail un produit avec tous les sous-éléments liés par la relation entre les entités),
+b. « formulaire ajouter un sous-élément existant » (fragment de page),
+c. « formulaire supprimer un sous-élément existant » (fragment de page),
+d. « formulaire nouveau sous-élément »,
+e. « formulaire supprimer un produit possédant des sous-éléments » (fragment de page) ;
+7. Implémenter dans un contrôleur les méthodes chargées
+a. d’extraire de la table un produit et ses sous-éléments liés et l’afficher dans le template de type fiche ;
+b. de récupérer, valider les données de formulaire, ajouter un sous-élément existant et le mettre à jour dans la base de données,
+c. de récupérer, valider les données de formulaire, créer un nouveau sous-élément lié et l’insérer dans la base de données,
+d. de récupérer, valider les données de formulaire, ajouter un nouveau sous-élément et le mettre à jour dans la base de données,
+e. de supprimer de la base de données un produit précis et gérer la suppression des données liées en cascade ;
+8. Définir les routes permettant l’affichage de la page Web et la gestion des formulaires qui affiche la fiche ;
+9. Terminer le mapping Objet-Relationnel de la base de données en terminant par les tables possédant des clés étrangères.
+Références
+Le tutoriel à suivre et adapter est le roadmap intitulé Backend Kit (chapitres 5 et 6).
+Routage des requêtes
+Nom de la routeURLMéthodeDescriptionartist.show/artist/{id}GETAffiche l’artiste dont l’id est fourni dans l’URL détaillé par typeartist.create/artist/createGETAffiche un formulaire videartist.store/artist/POSTPersiste les données relative à l’artiste et aux types spécifiés du formulaire dans la BDartist.edit/artist/edit/{id}GETAffiche un formulaire rempli des données de l’artiste dont l’id est fourni dans l’URL détaillé par typeartist.update/artist/PUTPersiste les données du formulaire relative à l’artiste et aux types spécifiés dans la BDartist.delete/artist/{id}DELETESupprime de la BD l’artiste dont l’id est fourni dans l’URL…
+Dictionnaire de données
+artists
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULIdEntier longId de l’artisteClé primairefirstnameTexte (60)Prénom de l’artistelastnameTexte (60)Nom de l’artiste
+types
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId du typeClé primairetypeTexte (60)Fonction de l’artiste (métier)
+artist_type
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULIdEntier longId de l’artisteClé primaireartist_idEntier longId de l’artisteClé étrangèretype_idEntier longId du type d’artisteClé étrangère
+shows
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de l’artisteClé primairelocation_idEntier longId du lieu (locations)Clé étrangère, Null autoriséslugTexte (60)Label court d’identificationTitre slugifié automatiquement, UniquetitleTexte (255)Titre du spectacleposter_urlTexte (255)URL de l’afficheNull autorisébookableBooleanRéservable ou nonpriceDoublePrix du spectacledescriptionTexte longDescription du spectaclecreated_atDATEDate de créationNull autorisé
+localities
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de l’artisteClé primairepostal_codeTexte (6)Code postalUniquelocalityTexte (60)Désignation officielle de la localitéUnique
+locations
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de l’artisteClé primairelocality_idEntier longId de la localité (localities)Clé étrangère, Null autoriséslugTexte (60)Label court d’identificationTitre slugifié automatiquement, UniquedesignationTexte (60)Désignation officielle du lieuaddressTexte (255)Addresse du lieuNull autoriséwebsiteTexte (255)Site Web du lieuNull autoriséphoneTexte (30)Numéro de téléphone du lieuNull autorisé
+collaborations (artist_type_show)
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de l’artisteClé primaireartist_type_idEntier longId de l’artiste associé à un type (fonction)Clé étrangèreshow_idEntier longId du spectacleClé étrangère
+TODO : Ajouter les autres dictionnaires de données
+Modalités
+
+Planning
+L’itération 5 doit faire l’objet d’une remise sur le dépôt de versioning en ligne.
+
+
+Itération 6 – Produire une API RESTful
+Cette itération doit permettre d’implémenter un webservice sécurisé exposant des données de notre catalogue à nos membres affiliés authentifiés. L’approche sera volontairement basique mais le niveau de complexité pourra être affiné par chaque groupe.
+Les données ainsi exposées pourront également être utilisées par le framework frontend de notre application (React, Angular, VueJS…).
+Itération 7 – Utiliser un progiciel
+Cette itération consiste à installer et utiliser un composant logiciel tierce qui permet de résoudre une fonctionnalité du cahier des charges. L’idée est de réduire le temps de développement en favorisant l’intégration et la réutilisation de code. Fonctionnalités concernées :
+* Générer un flux RSS,
+* Incorporer un back-office de gestion CRUD des données,
+* Exporter des données en CSV ou PDF,
+* Importer des données au format CSV,
+* Générer une API Restful.
+Contraintes et règle métier
+Pour cette itération, il est demandé d’installer et utiliser un composant tierce afin d’optimiser le développement en respectant les bonnes pratiques et les contraintes de sécurité.
+Modalités
+L’itération 6 doit faire l’objet d’une remise sur le dépôt de versioning en ligne.
+
+
+Itération 8 – Prototypage
+Implémenter les maquettes HTML au moyen de templates et d’un framework HTML/CSS (Bootstrap, Foundation…).
+Analyse
+Diagramme de navigation
+Les diagrammes de navigation, issus des use cases, nous permettent d’identifier les écrans (interfaces graphiques, pages web) dont l’application a besoin.
+Navigation S’inscrire + Se connecter
+
+Mais il faut également analyser les use cases en identifiant dans les scénarios les composants visuels (titres, texte et images dynamiques, formulaires) et interactifs (boutons, hyperliens) nécessaires.
+Diagrammes de cas d’utilisation
+Use case S’inscrire
+Scénario nominal
+1. Un internaute clique sur le lien/bouton S’inscrire présent dans l’en-tête de toutes les pages.2. Le système affiche le formulaire d’inscription.3. L’internaute encode :
+a. un login,
+b. un mot de passe (min. 6 caractères, au moins une majuscule et un caractère spécial),
+c. la confirmation du mot de passe,
+d. son prénom,
+e. son nom,
+f. son email,
+g. sa langue (choix dans une liste).4. De façon asynchrone, le système vérifie :
+a. La disponibilité du login,
+b. La validité du mot de passe,
+c. La correspondance des mots de passe,
+d. La disponibilité de l’email.
+Un message de notification s’affiche pour chaque cas d’erreur et le bouton pour s’inscrire reste désactivé.
+Lorsque tous les champs sont validés, le bouton S’inscrire est activé.5. L’internaute clique sur le bouton S’inscrire après avoir rempli tous les champs de façon adéquate.6. Le système valide les données reçues côté serveur.
+7. Le système enregistre les données dans la base de données (table users) :
+a. Le mot de passe est hashé,
+b. Le rôle member est assigné par défaut.
+8. Le système envoie un email de confirmation à l’internaute.
+9. Le système redirige l’internaute vers la page de connexion (login/mot de passe) avec un message de confirmation l’invitant à se connecter.Scénario alternatif
+5. L’internaute clique sur le bouton S’inscrire après avoir rempli tous les champs mais les données n’ont pas pu être validées côté client ou ont été altérées entretemps (piratage).6. Le système invalide les données reçues côté serveur.
+7. Le système redirige l’internaute vers le formulaire d’inscription avec un message d’erreur reprenant les validations qui ont échouées.
+Il ressort du diagramme de navigation et de ce scénario le besoin de créer les deux templates et le fragment de page suivants : un formulaire d’inscription, un formulaire de connexion et un menu d’authentification.
+Vous pouvez utiliser des outils de développement rapide d’application (RAD) tels que les nombreux framework HTML/CSS/JS (Bootstrap ou Foundation) disponibles sur le Web pour personnaliser des templates et y intégrer les composants graphiques nécessaires, ainsi que des librairies afin de faciliter la programmation front-end (jQuery).
+* https://jquery.com/download/ 
+* https://getbootstrap.com/docs/4.1/examples/ 
+* https://bootsnipp.com (page snippets, forms ou builder)
+Use case Consulter le catalogue paginé des spectacles
+Scénario nominal
+1. Un internaute ou un membre clique sur le lien Catalogue présent dans le menu dans l’en-tête de toutes les pages.2. Le système affiche le catalogue présentant la liste des spectacles triés par titre et paginés par 10.3. L’internaute clique sur un des liens du menu de pagination pour changer de page.4. Le système affiche les spectacles suivants correspondants à la page demandée.5. L’internaute clique sur un des liens de tri (titre, lieu, réservable, prix).6. Le système affiche la première page des spectacles triés selon le critère demandé.7. L’internaute sélectionne un critère parmi les listes déroulantes des formulaires de filtre (lieu, réservable).8. Le système affiche la première page des spectacles filtrés selon le critère demandé.9. L’internaute entre un mot-clé dans le formulaire de recherche.10. Le système affiche les spectacles correspondants au critère entré.11. L’internaute clique sur un des liens du menu de pagination pour changer de page.12. Le système affiche les spectacles suivants ou précédents correspondants à la page demandée en conservant les critères de tri, de filtre ou de recherche.
+Il ressort de ce scénario le besoin de créer un template avec un tableau présentant la liste des spectacles.
+Nous pouvons chercher ce composant graphique parmi les ceux de Bootstrap ou utiliser la librairie Datatables qui offre des fonctionnalités supplémentaires (tri, filtre, recherche et pagination) :
+* https://getbootstrap.com/docs/4.1/content/tables/ 
+
+* https://datatables.net/  
+
+
+Écrans et navigation
+Mockups
+Trame de page principale
+
+Formulaire d’inscription
+
+Formulaire de connexion
+
+Menu d’authentification
+Ce menu sera intégré dans l’en-tête de la page d’accueil.
+
+Catalogue des spectacles
+Ce catalogue sera intégré dans la page d’accueil.
+ 
+Menu de navigation
+Ce menu sera intégré dans l’en-tête ou dans la sidebar de toutes les pages (sauf administration).
+
+
+
+
+Itération 9 – Consommer une API RESTful
+Un exemple d’application double (client + serveur) implémentant les principes d’une API Restful est disponible sur GitHub : https://github.com/cedryc-ruth/caviste2018.git 
+Veuillez utiliser une API publique du type OpenData. Généralement, il suffit de créer un compte pour avoir accès à l’API.
+Exemples d’API :
+* London Theater : https://developer.londontheatredirect.com/Documentation
+* Théâtre de la ville de Paris: https://api.theatredelaville-paris.com/
+* Théâtre contemporain : https://www.theatre-contemporain.net/images/partenaires/descriptif_opendata_api_cris-v4.pdf
+* Agenda.Brussels : https://api.brussels/store/apis/info?name=agenda.brussels&version=0.0.1&provider=admin
+
+
+Itération 10 – Aspects légaux
+Acceptation des cookies
+* Bandeau d’acceptation
+* Réglages / Paramétrage 
+
+
+
+ 
+ 
+
+
+1 Diagrammes réalisés sur https://www.draw.io/ 
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+
+PID – Projet Réservations
+
+

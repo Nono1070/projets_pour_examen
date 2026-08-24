@@ -1,0 +1,521 @@
+Projet Réservations – Django 5 Roadmap API
+Prérequis
+* Kit de démarrage : Roadmap Django 5 (chapitres 1 à 4).
+Pour votre information
+Le présent roadmap a été rédigé en partie en utilisant l’intelligence artificielle, à savoir ChatGPT. Toutefois, comme la solution générée ne convenait pas parfaitement, elle a été revue et corrigée en se reférant principalement à la documentation officielle (Django 5 et Djando Rest Framework) mais aussi aux articles de blogs et aux forums spécialisés.
+Toutes les étapes ont été implémentées et testées avec l’éditeur VSCode, Django 5.1.2, Python 3.11.2 et Django REST framework 3.15.2. Pour les tests, l’extension Thunder Client a été utilisée dans VSCode.
+Chapitre 8 – Produire une API restful
+https://www.django-rest-framework.org/
+https://swagger.io/resources/articles/documenting-apis-with-swagger/
+https://django-rest-swagger.readthedocs.io/en/latest/
+Créer une API RESTful conforme au principe HATEOAS avec Django 5 pour une table artists (avec les champs firstname et lastname) peut être réalisé en suivant les étapes ci-dessous :
+N.B. : Normalement, vous avez déjà réalisé le prérequis (roadmap Kit de démarrage). Si ce n’est pas le cas, nous détaillerons malgré tout les étapes 1 à 3 avec des instructions facultatives mais rendant ce roadmap totalement indépendant de tout prérequis.
+
+Étape 0 : Créer une nouvelle branche de développement
+Si vous versionnez votre code avec Git, créez et basculez sur une nouvelle branche de développement nommée « api », par exemple.
+git checkout -b api
+
+Étape 1 : Installer Django et Django REST Framework
+Si ce n’est déjà fait, installez Django :
+pip install django
+Installez Django Rest Framework :
+pip install djangorestframework
+
+Étape 2 : Configurer un projet Django
+1. Si ce n’est déjà fait, créez un projet et une application :
+django-admin startproject reservations
+cd myproject
+python manage.py startapp catalogue
+2. Ajoutez catalogue et rest_framework aux INSTALLED_APPS dans settings.py.
+Extrait de settings.py :
+reservations\reservations\settings.py
+#...
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'catalogue',
+    'accounts',
+    'rest_framework',
+]
+
+
+Étape 3 : Créer le modèle Artist
+Vous pouvez passer cette étape si vous avez déjà réalisé le kit de démarrage.
+Si ce n’est déjà fait, créez un modèle pour les artistes.
+reservations\catalogue\models\artist.py
+from django.db import models
+from .type import *
+
+class Artist(models.Model):
+    firstname = models.CharField(max_length=60)
+    lastname = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.firstname +" "+ self.lastname
+    
+    class Meta:
+        db_table = "artists"
+
+Notez qu’il s’agit ici d’un minimum. Votre modèle Artist peut contenir plus de définitions que le présent code source, si vous aviez déjà avancé dans les autres roadmaps.
+Si ce n’est déjà fait, appliquez les migrations :
+python manage.py makemigrations
+python manage.py migrate
+
+Étape 4 : Créer un serializer
+Les serializers convertissent les objets Django en JSON et vice versa.
+reservations\catalogue\models\serializers.py
+from rest_framework import serializers
+from .models import Artist
+
+class ArtistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Artist
+        fields = ['id', 'firstname', 'lastname']
+
+
+
+Étape 5 : Créer des vues avec Django REST Framework
+Créez des vues génériques pour gérer les artistes.
+reservations\api\catalogue\views.py
+from catalogue.models import Artist
+from .serializers import ArtistSerializer
+from rest_framework import generics
+
+class ArtistListCreateView(generics.ListCreateAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+
+class ArtistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+
+
+
+Étape 6 : Configurer les routes
+Ajoutez les routes à l’API dans urls.py.
+reservations\catalogue\urls.py
+"""reservations.catalogue URL Configuration
+"""
+from django.urls import path
+
+from . import views
+from api.catalogue.views import ArtistListCreateView, ArtistRetrieveUpdateDestroyView
+
+app_name='catalogue'
+
+urlpatterns = [
+    path('artist/', views.artist.index, name='artist-index'),
+    path('artist/<int:artist_id>', views.artist.show, name='artist-show'),
+    path('artist/edit/<int:artist_id>', views.artist.edit, name='artist-edit'),
+    path('artist/create', views.artist.create, name='artist-create'),
+    path('artist/delete/<int:artist_id>', views.artist.delete, name='artist-delete'),
+    path('type/', views.type.index, name='type-index'),
+    path('type/<int:type_id>', views.type.show, name='type-show'),
+    path('locality/', views.locality.index, name='locality-index'),
+    path('locality/<int:locality_id>', views.locality.show, name='locality-show'),
+    path('price/', views.price.index, name='price-index'),
+    path('price/<int:price_id>', views.price.show, name='price-show'),
+    path('location/', views.location.index, name='location-index'),
+    path('location/<int:location_id>', views.location.show, name='location-show'),
+    path('show/', views.show_.index, name='show-index'),
+    path('show/<int:show_id>', views.show_.show, name='show-show'),
+    path('representation/', views.representation.index, name='representation-index'),
+    path('representation/<int:representation_id>', views.representation.show, name='representation-show'),
+
+    path('api/artists/', ArtistListCreateView.as_view(), name='artist-list'),
+    path('api/artists/<int:pk>/', ArtistRetrieveUpdateDestroyView.as_view(), name='artist-detail'),
+]
+
+
+Étape 7 : Tester l’API
+Démarrez le serveur de développement :
+python manage.py runserver
+Dans votre navigateur, vous pouvez directement tester les endpoints en requête GET en accédant aux URLs suivantes :
+* http://localhost:8000/catalogue/api/artists/ 
+* http://localhost:8000/catalogue/api/artists/1/  
+
+
+Par contre, pour tester les requêtes POST, PUT et DELETE, il faut utiliser un client Rest tel que Postman ou cURL.
+Utilisation de cURL
+Pour utiliser cURL, vous devez ouvrir un terminal de commande Git Bash. Attention, n’oubliez pas de mentionner le slash final pour chaque terminaison d’URL (endpoint).
+* Récupérer tous les artistes
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8000/catalogue/api/artists/
+* Récupérer un artiste spécifique
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8000/catalogue/api/artists/1/
+* Ajouter un artiste
+curl -X POST -H "Content-Type: application/json" -d '{"firstname": "Bob", "lastname": "Sull"}' http://localhost:8000/catalogue/api/artists/
+* Modifier un artiste spécifique
+curl -X PUT -H "Content-Type: application/json" -d '{"firstname": "Fred", "lastname": "Astaire"}' http://localhost:8000/catalogue/api/artists/1/
+* Supprimer un artiste spécifique
+curl -X DELETE http://localhost:8000/catalogue/api/artists/1/
+Attention, il est possible que vous obteniez une erreur de type RestrictedError “Exception value : Cannot delete some instances of Model Artist because they are referenced through restricted foreign keys…”. En effet, si l’artiste que vous voulez supprimer a une relation avec le modèle Type par exemple, vous ne pourrez pas le supprimer sans supprimer en premier la relation. Pour tester la suppression, créez d’abord un nouvel artiste. Retrouver l’id qui lui a été attribué et vous pourrez ensuite le supprimer en renseignant son id. Par exemple, si son id est 14  :
+curl -X DELETE http://localhost:8000/catalogue/api/artists/14/
+Utilisation d’un client Rest graphique
+Vous pouvez pour plus de comfort installer un client Rest avec une interface graphique. Postman est assez répandu dans la profession. Toutefois, nous ne la recommandons plus en formation car elle nécessite désormais de s’inscrire sur leur site même pour la version gratuite.
+En guise d’alternative, si vous  développez sur VSCode, vous pouvez utiliser l’extension Thunder Client1. L’EDI IntelliJ propose par défaut son extension HTTP Client2. Vous n’aurez donc rien à installer de plus. Par contre, sur Eclipse, nous n’avons pas trouvé de solution satisfaisante dans le market place à ce jour. C’est pourquoi, dans la suite de ce roadmap, nous utiliserons une extension Chrome. Vous pouvez donc installer l’extension Talend API Tester3 dont la version gratuite est amplement suffisante. 
+
+
+
+
+Étape 8 : Authentification
+Pour ajouter une authentification aux requêtes POST, PUT, et DELETE dans une API Django REST Framework (DRF), vous pouvez configurer l'authentification et les permissions. Voici comment procéder :
+
+Étape 8.1 : Ajouter des permissions globales
+Dans votre fichier settings.py, activez les permissions globales et définissez le mécanisme d’authentification.
+https://www.django-rest-framework.org/api-guide/authentication/ 
+reservations\reservations\settings.py
+#...
+
+# REST Framework authentications & parmissions
+# https://www.django-rest-framework.org/api-guide/authentication/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # Pour l'authentification basée sur la session
+        'rest_framework.authentication.SessionAuthentication',
+        # Pour l'authentification de base (utile pour Postman/cURL)
+        'rest_framework.authentication.BasicAuthentication',
+        # Pour l'authentification via Token
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # Exige l'authentification pour toutes les requêtes
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
+Étape 8.1.2 : Tester l’authentification
+Démarrez le serveur de développement :
+python manage.py runserver
+Dans votre navigateur, vous pouvez directement tester les endpoints en requête GET en accédant aux URLs suivantes :
+* http://localhost:8000/catalogue/api/artists/
+* http://localhost:8000/catalogue/api/artists/1/
+
+Vous pouvez constater que ces endpoints sont sécurisées. Testons avec cURL :
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8000/catalogue/api/artists/1/
+HTTP/1.1 403 Forbidden
+…
+{"detail":"Authentication credentials were not provided."}
+Nous obtenons une erreur 403 lorsque nous ne fournissons pas d’authentification.
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8000/catalogue/api/artists/1/ --user "bob:wrong_password"
+HTTP/1.1 403 Forbidden
+…
+{"detail":"Invalid username/password."}
+Idem lorsque le login et/ou le mot de passe est incorrect.
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8000/catalogue/api/artists/1/ --user "bob:12345678"
+HTTP/1.1 200 OK
+…
+{"id":1,"firstname":"Daniel","lastname":"Marcelin","links":{"self":"http://localhost:8000/catalogue/api/artists/1/","all_artists":"http://localhost:8000/catalogue/api/artists/"}}
+Nous obtenons la ressource demandée lorsque l’authentification est valide. Avec l’option --user, nous avons renseigné « bob » et son mot de passe « 12345678 ». Si besoin, sachez que vous pouvez créer un administrateur en ligne de commande :
+py manage.py createsuperuser
+À présent, testez à nouveau les requêtes POST, PUT et DELETE avec cURL ou le client Rest graphique de votre choix. Toutefois, n’oubliez pas d’ajouter le login et le mot de passe de l’administrateur (voir table users).
+Test avec cURL
+* Supprimer un artiste spécifique
+curl -X DELETE http://localhost:8000/catalogue/api/artists/1/ --user "bob:12345678"
+Test avec Talend API Tester
+Il faut ajouter l’en-tête Authorization à nos requêtes POST, PUT et DELETE. Pour cela, il suffit de cliquer sur le bouton Add authorization dans la partie HEADERS. Une boîte de dialogue nous permet ensuite d’encoder le login (bob) et le mot de passe (12345678) de notre administrateur.
+
+* Supprimer un artiste spécifique
+Il faut fournir un endpoint présentant l’id de l’artiste que l’on souhaite supprimer. Par exemple, http://localhost:8000/catalogue/api/admin/artists/28/ 
+
+Notez que la requête réussira toujours même si l’id n’est pas trouvé. L’important est de siginifier à l’utilisateur que la ressource demandée n’existe plus.
+* Ajouter un artiste
+En plus de l’en-tête Authorization, nous ajoutons dans la partie BODY le firstname et le lastname du nouvel artiste au format JSON, par exemple.
+
+* Modifier un artiste
+Dans la partie BODY, nous modifions le firstname et/ou le lastname au choix. La requête PUT est identique à la requête POST à la différence que nous ajoutons l’id de l’artiste à modifier. Par exemple, si l’artiste dont l’id est 30 existe : http://localhost:8000/catalogue/api/admin/artists/30/
+
+Pour toutes ces requêtes, vous devriez obtenir une réponse avec le code 200 OK.
+
+
+Étape 8.2 : Ajouter des permissions spécifiques aux vues
+Si vous souhaitez appliquer des permissions uniquement aux requêtes POST, PUT, et DELETE, vous pouvez utiliser la classe DjangoModelPermissions ou une permission personnalisée.
+Exemple d’utilisation de DjangoModelPermissions dans les vues :
+reservations\api\catalogue\views.py
+from rest_framework.permissions import DjangoModelPermissions
+from rest_framework import generics
+from catalogue.models import Artist
+from .serializers import ArtistSerializer
+
+class ArtistListCreateView(generics.ListCreateAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+    permission_classes = [DjangoModelPermissions]
+
+class ArtistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+    permission_classes = [DjangoModelPermissions]
+    
+DjangoModelPermissions :
+* Autorise les actions basées sur les permissions définies dans Django (e.g., add_artist, change_artist, delete_artist).
+* Vous devez associer ces permissions aux utilisateurs ou groupes via l’interface d’administration Django.
+Connectons-nous au back-office de Django http://localhost:8000/admin. Si ce n’est déjà fait, créez un utilisateur qui fera partie du groupe MEMBER. Retirez-lui toutes les permissions sauf les permissions View. Vous pouvez définir les permissions par groupe ou pour un utilisateur en particulier.
+
+Ensuite, testons notre API avec cet utilisateur dont les permissions sont limitées aux requêtes GET.
+
+* Test pour afficher un artiste => succès
+Nous définissons une requête GET vers la terminaison d’URL /api/artists/1/. Pour l’authentification, nous mentionnons « anna », notre utilisateur aux permissions limitées.
+
+La requête réussit et on obtient la ressource demandée.
+* Test pour ajouter un artiste => échec
+Nous définissons une requête POST vers la terminaison d’URL /api/artists/. En plus de l’authentification avec « anna », nous ajoutons dans la partie BODY le firstname et le lastname du nouvel artiste au format JSON, par exemple.
+Nous obtenons le code d’erreur 403 et le message « You do not have permission to perform this action. ». Notre logique d’autorisation basée sur les permissions créées dans Django Admin fonctionne.
+
+Étape 8.3 : Ajouter des permissions personnalisées (optionnel)
+Si vous avez besoin de permissions plus granulaires (e.g., seulement restreindre POST, PUT, et DELETE), créez une classe de permission personnalisée.
+reservations\api\catalogue\permissions.py
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+class IsAuthenticatedOrReadOnly(BasePermission):
+    """
+    Autorise les requêtes de lecture pour tout le monde,
+    mais exige l'authentification pour POST, PUT et DELETE.
+    """
+
+    def has_permission(self, request, view):
+        # Autorise toutes les requêtes de lecture (GET, HEAD, OPTIONS)
+        if request.method in SAFE_METHODS:
+            return True
+        # Autorise POST, PUT, DELETE uniquement pour les utilisateurs authentifiés
+        return request.user and request.user.is_authenticated
+
+Appliquez cette permission aux vues concernées.
+reservations\api\catalogue\views.py
+#from rest_framework.permissions import DjangoModelPermissions
+from rest_framework import generics
+from catalogue.models import Artist
+from .serializers import ArtistSerializer
+from .permissions import IsAuthenticatedOrReadOnly
+
+class ArtistListCreateView(generics.ListCreateAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+    #permission_classes = [DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class ArtistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+    #permission_classes = [DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+
+Testons à nouveau avec notre membre « anna » dont les permissions sont limitées. Nous définissions une requête POST. Cette fois-ci, elle réussit à créer un nouvel artiste.
+
+Par contre, si nous ne mentionnons pas son username et son password, la requête échoue.
+
+
+Étape 8.4 : Ajouter une authentification via Token (optionnel)
+L’authentification par token fournie par Django REST framework est une implémentation relativement simple. Nous n’allons donc pas l’utiliser mais installer un autre paquetage.
+« JSON Web Token est une norme relativement nouvelle qui peut être utilisée pour l'authentification basée sur des jetons. Contrairement au schéma TokenAuthentication intégré, JWT Authentication n'a pas besoin d'utiliser une base de données pour valider un jeton. Un package pour l'authentification JWT est djangorestframework-simplejwt qui fournit certaines fonctionnalités ainsi qu'une application de liste noire de jetons enfichable. »4
+Si vous souhaitez utiliser des tokens pour l’authentification, ajoutez la dépendance suivante :
+pip install djangorestframework-simplejwt
+Configurez settings.py pour inclure JWT :
+reservations\reservations\settings.py
+#...
+
+# REST Framework authentications & parmissions
+# https://www.django-rest-framework.org/api-guide/authentication/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # Pour l'authentification basée sur la session
+        'rest_framework.authentication.SessionAuthentication',
+        # Pour l'authentification de base (utile pour Postman/cURL)
+        'rest_framework.authentication.BasicAuthentication',
+        # Pour l'authentification via Token
+        #'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # Exige l'authentification pour toutes les requêtes
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+Nous remplaçons TokenAuthentication par JWTAuthentication. Notez que dans cette configuration, nous conservons BasicAthentication. Vous pourrez toujours envoyer des requêtes avec une authentification basique comme précédemment.
+Ajoutez des endpoints pour obtenir et rafraîchir les tokens.
+reservations\catalogue\urls.py
+"""reservations.catalogue URL Configuration
+"""
+from django.urls import path
+
+from . import views
+from api.catalogue.views import ArtistListCreateView, ArtistRetrieveUpdateDestroyView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+app_name='catalogue'
+
+urlpatterns = [
+    path('artist/', views.artist.index, name='artist-index'),
+    path('artist/<int:artist_id>', views.artist.show, name='artist-show'),
+    path('artist/edit/<int:artist_id>', views.artist.edit, name='artist-edit'),
+    path('artist/create', views.artist.create, name='artist-create'),
+    path('artist/delete/<int:artist_id>', views.artist.delete, name='artist-delete'),
+
+#...
+
+    path('api/artists/', ArtistListCreateView.as_view(), name='artist-list'),
+    path('api/artists/<int:pk>/', ArtistRetrieveUpdateDestroyView.as_view(), name='artist-detail'),
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+
+
+Étape 8.4.2 : Tester avec Postman ou cURL
+1. Obtenez un token (si vous utilisez JWT).
+2. Faites une requête POST, PUT ou DELETE avec le header d’authentification :
+o Header : Authorization: Bearer <your_token>
+3. Assurez-vous que l’utilisateur dispose des permissions nécessaires.
+Vous pouvez maintenant obtenir un token avec :
+curl -X POST -H "Content-Type: application/json" -d "{\"username\": \"bob\", \"password\": \"12345678\"}" http://127.0.0.1:8000/catalogue/api/token/
+Utilisez ce token dans vos requêtes API :
+curl -X POST -H "Authorization: Bearer <your_token>" -H "Content-Type: application/json" -d "{\"firstname\": \"Andrew\", \"lastname\": \"Garfield\"}" http://127.0.0.1:8000/catalogue/api/artists/
+
+Exemples de cas d’erreur :
+* Token manquant
+
+* Token invalide
+
+* Token expiré
+
+
+Avec cette configuration, vous protégez efficacement les requêtes POST, PUT et DELETE tout en permettant des requêtes GET non authentifiées si besoin.
+
+Différence entre RPC et API Restful
+En fait, ce que nous avons construit jusqu'à présent est mieux décrit comme RPC (Remote Procedure Call), car il n'y a aucun moyen de savoir comment interagir avec ce service. Si vous publiiez cela aujourd'hui, vous devriez également rédiger un document ou héberger un portail de développeurs quelque part avec tous les détails.
+Pour rendre cette solution conforme aux principes RESTful hypermedia (HATEOAS - Hypermedia as the Engine of Application State), vous devez inclure des liens hypermédia dans les réponses de l'API. Ces liens aident les clients à naviguer dans les ressources sans avoir besoin de connaître la structure exacte des endpoints à l'avance.
+Structure des réponses avec hypermedia
+Chaque réponse doit inclure des liens qui décrivent les actions possibles sur la ressource. Par exemple, une réponse pour un artiste pourrait inclure des liens pour :
+* Afficher les détails de l'artiste.
+* Modifier l'artiste.
+* Supprimer l'artiste.
+Extrait de la documentation5 :
+REST Framework est une boîte à outils API Web agnostique. Il vous aide à créer des API bien connectées et facilite la conception de types de médias appropriés, mais il n'impose pas strictement un style de conception particulier.
+REST Framework permet de créer des API hypermédias. L'API navigable qu'il propose est basée sur HTML - le langage hypermédia du Web.
+Il comprend également des composants de sérialisation et d'analyse/rendu qui facilitent la création de types de médias appropriés, des relations hyperliées pour la création de systèmes bien connectés et un excellent support pour la négociation de contenu.
+Ce que REST Framework ne fait pas, c'est vous fournir des formats hypermédias lisibles par machine tels que HAL, Collection+JSON, JSON API ou des microformats HTML par défaut, ou la possibilité de créer automatiquement des API de style HATEOAS complet qui incluent des descriptions de formulaire basées sur l'hypermédia et des hyperliens étiquetés sémantiquement. Cela impliquerait de faire des choix avisés sur la conception des API qui devraient vraiment rester en dehors du champ d'application du framework.
+
+Étape 9 : Ajouter HATEOAS avec un hyperlinked serializer
+Pour respecter le principe HATEOAS, utilisez un HyperlinkedModelSerializer.
+reservations\catalogue\models\serializers.py
+from rest_framework import serializers
+from catalogue.models import Artist
+from rest_framework.reverse import reverse
+
+class ArtistSerializer(serializers.HyperlinkedModelSerializer):
+    links = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Artist
+        fields = ['id', 'firstname', 'lastname', 'links']
+
+    def get_links(self, obj):
+        request = self.context.get('request')
+        return {
+            'self': reverse('catalogue:artist-detail', kwargs={'pk': obj.id}, request=request),
+            'all_artists': reverse('catalogue:artist-list', request=request),
+        }
+
+
+Étape 10 : Tests
+Vous pouvez relancer les tests des requêtes GET, POST, PUT, DELETE afin de voir le changement.
+Exemples de réponse avec HATEOAS
+Liste des artistes (GET /catalogue/api/artists/) :
+[
+    {
+        "id": 1,
+        "firstname": "John",
+        "lastname": "Doe",
+        "links": {
+            "self": "http://127.0.0.1:8000/catalogue/api/artists/1/",
+            "all_artists": "http://127.0.0.1:8000/catalogue/api/artists/"
+        }
+    },
+    {
+        "id": 2,
+        "firstname": "Jane",
+        "lastname": "Smith",
+        "links": {
+            "self": "http://127.0.0.1:8000/catalogue/api/artists/2/",
+            "all_artists": "http://127.0.0.1:8000/catalogue/api/artists/"
+        }
+    }
+]
+Détail d’un artiste (GET /catalogue/api/artists/1/) :
+{
+    "id": 1,
+    "firstname": "John",
+    "lastname": "Doe",
+    "links": {
+        "self": "http://127.0.0.1:8000/catalogue/api/artists/1/",
+        "all_artists": "http://127.0.0.1:8000/catalogue/api/artists/"
+    }
+}
+
+Étape 11 : Ajout de tests automatisés (optionnel)
+https://docs.djangoproject.com/fr/5.1/topics/testing/overview/
+Ajoutez des tests pour vérifier que vos endpoints fonctionnent comme prévu.
+reservations\catalogue\tests_api.py
+from rest_framework.test import APITestCase
+from rest_framework import status
+from catalogue.models import Artist
+
+class ArtistAPITests(APITestCase):
+    def test_create_artist(self):
+        data = {'firstname': 'John', 'lastname': 'Doe'}
+        response = self.client.post('/catalogue/api/artists/', data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_artist_list(self):
+        Artist.objects.create(firstname='Jane', lastname='Smith')
+        response = self.client.get('/catalogue/api/artists/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+Lancer les tests :
+py manage.py test
+
+Found 2 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.045s
+
+OK
+Destroying test database for alias 'default'...
+
+Avec cette implémentation, vous obtenez une API RESTful conforme au principe HATEOAS en Python avec Django 5. Votre API fournit des liens hypermédia dans ses réponses pour guider les clients sur les relations et actions possibles.
+
+Étape 12 : Gestion CSRF (en production) TODO
+Pour sécuriser l'API tout en maintenant CSRF activé, ajoutez un header CSRF token dans vos requêtes POST, PUT et DELETE. Utilisez le service Spring Security pour générer un token valide. Vous pouvez consulter la documentation officielle pour plus de détails.
+
+Étape 13 : Documentation pour les clients	TODO
+Ajoutez une documentation claire (via OpenAPI/Swagger ou un fichier README) pour expliquer aux clients comment utiliser les liens hypermédia et naviguer dans l'API.
+https://swagger.io/resources/articles/documenting-apis-with-swagger/ 
+https://django-rest-swagger.readthedocs.io/en/latest/
+
+Autre solution : FastAPI	TODO
+1 https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client 
+2 https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html 
+3 https://chromewebstore.google.com/detail/talend-api-tester-free-ed/aejoelaoggembcahagimdiliamlcdmfm?pli=1 
+4 https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication
+5 https://www.django-rest-framework.org/topics/rest-hypermedia-hateoas/
+---------------
+
+------------------------------------------------------------
+
+---------------
+
+------------------------------------------------------------
+

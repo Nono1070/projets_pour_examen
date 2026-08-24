@@ -1,0 +1,49 @@
+Projet Réservations – Cahier de charges additionnel
+F1 – Un utilisateur consulte la liste des salles d’un lieu de spectacle.
+F2 – Un utilisateur consulte la liste des représentations d’un spectacle pour savoir dans quelle salle se donne chaque représentation.
+A1 – Un administrateur ajoute une représentation pour un spectacle dans une salle.
+
+Installer et configurer le projet Réservations disponible sur GitHub : 
+https://github.com/cedryc-ruth/resLara2021
+https://github.com/cedryc-ruth/reservationsSpringBoot
+https://github.com/cedryc-ruth/reservationsSymfony
+
+rooms
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId du médiaClé primairenameTexte (60)Mot-cléNull interdit, contrainte d’unicitéseatsEntier courtNombre de places disponibles>0
+Partie Backend
+Dans la base de données reservations,
+- Supprimez la relation entre la table representations et locations, y compris le champ location_id.
+- Ajoutez une table rooms (id, name, seats) : les salles d’un lieu de spectacle.
+- Liez la table rooms aux tables locations et representations, sans oublier les contraintes d’intégrité référentielle.
+D’une part, sachant qu’un lieu de spectacle dispose de plusieurs salles et qu’une salle appartient à un seul lieu de spectacle.
+D’autre part, sachant qu’une représentation se donne dans une seule salle et qu’une salle peut être utilisée pour plusieurs représentations.
+
+Dans le framework,
+- Générez le nouveau modèle (l'entité)
+- Définissez et injectez des données de test (data fixtures, seeders,…)
+- Définissez le mapping relationnel entre les différents modèles 
+o un lieu de spectacle dispose de plusieurs salles,
+une salle appartient à un seul lieu.
+o une représentation se donne dans une seule salle,
+une salle peut être utilisée pour plusieurs représentations.
+
+- Affichez la liste des salles (nom et nombre de places) d’un lieu de spectacle.
+- Affichez la liste des représentations (date, heure, lieu et salle) d’un spectacle.
+- Modifiez ou créez le formulaire d'ajout de représentations de façon à 
+o afficher une liste déroulante pour le choix du spectacle et une autre liste pour le choix de la salle,
+o empêcher l’ajout si la salle est déjà occupée au même moment,
+o empêcher le traitement si l’utilisateur n’est pas administrateur.
+	
+- Définissez une route personnalisée qui permet d'afficher les spectacles d'une salle donnée en paramètre.
+o Gérez le traitement de cette route (contrôleur, template).
+
+Veuillez remettre une archive du projet au format ZIP sans oublier d’y inclure le DUMP SQL de la base de données.
+
+Critères d’évaluation
+C2 - Reproduire individuellement plusieurs consignes pertinentes du cahier de charges
+1. Modifier l'application backend étudiée au cours de manière à ajouter une table, son jeu de données et son mapping relationnel
+2. Utiliser les générateurs pour créer l'entité, le contrôleur et les templates
+3. Personnaliser un template (liste des catégories avec les spectacles)
+4. Personnaliser un contrôleur (longueur catégorie et catégorie affectée par défaut)
+5. Personnaliser un formulaire (liste déroulante plutôt que zone de texte)
+6. Définir une route personnalisée et paramétrée

@@ -1,0 +1,36 @@
+Projet Réservations – Cahier de charges additionnel
+F1 – Un utilisateur consulte le nom et le logo de la troupe d’un artiste.
+A1 – Un administrateur ajoute un artiste à une troupe.
+
+Installer et configurer le projet Réservations, au départ de votre implémentation ou en vous basant sur le code disponible sur GitHub : https://github.com/cedryc-ruth 
+
+troupes
+NOMTYPE (long)DESCRIPTIONCONTRAINTES /RÈGLE DE CALCULidEntier longId de la troupeClé primairenameTexte (60)Nom de la troupeUniquelogo_urlTexte (255)URL du logo de la troupe
+Partie Backend
+Définissez des migrations de façon à modifier la base de données reservations, sachant qu’une troupe regroupe zéro à plusieurs artistes (artists) et qu’un artiste appartient à une et une seul troupe (troupes).
+Veillez à bien identifier le type de relation (one-to-many, many-to-many ou one-to-one).
+Veillez à définir les contraintes d’intégrité référentielle suivantes : appliquer la cascade en cas de mise à jour et empêcher en cas de suppression.
+
+Dans le framework,
+- Générez le nouveau modèle (l'entité) Troupe
+- Définissez et injectez des données de test (data fixtures, seeders,…)
+- Définissez le mapping relationnel entre les différents modèles concernés 
+
+- Dans la fiche d’un artiste, 
+o affichez le nom de la troupe de l’artiste ou le texte « Non affilié »
+o affichez le logo de la troupe sous forme d’image sur 50 pixels de largeur,
+o ajoutez le formulaire d'affiliation à une troupe pour l’artiste
+* seul l’administrateur pourra voir ce formulaire,
+* prévoyez le champ name sous forme de liste déroulante pour choisir la troupe (remplissez la liste dynamiquement avec le nom des troupes + la mention « Non affilié »),
+o empêchez l’affiliation à une troupe si l’utilisateur n’est pas connecté en tant qu’administrateur.
+
+Veuillez remettre une archive du projet au format ZIP sans oublier d’y inclure le DUMP SQL de la base de données.
+
+Critères d’évaluation
+C2 - Reproduire individuellement plusieurs consignes pertinentes du cahier de charges
+1. Modifier l'application backend étudiée au cours de manière à ajouter une table, son jeu de données et son mapping relationnel
+2. Utiliser les générateurs pour créer l'entité, le contrôleur et les templates
+3. Personnaliser un template (liste des catégories avec les spectacles)
+4. Personnaliser un contrôleur (longueur catégorie et catégorie affectée par défaut)
+5. Personnaliser un formulaire (liste déroulante plutôt que zone de texte)
+6. Définir une route personnalisée et paramétrée
