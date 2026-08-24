@@ -19,10 +19,15 @@ def artist_index(request):
     artists = Artist.objects.all()
     title = 'Liste des artistes'
 
+    query = request.GET.get('q')
+    if query:
+        artists = artists.filter(lastname__icontains=query)
+        title = f"Résultats pour « {query} »"
+
     return render(request, 'artist/index.html', {
         'artists': artists,
         'title': title,
-        'query': '',
+        'query': query or '',
     })
 
 
