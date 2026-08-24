@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.contrib import messages
 
 from .models import Artist
 from .forms import ArtistForm
@@ -45,8 +46,11 @@ def artist_create(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            messages.success(request, "Nouvel artiste créé avec succès.")
 
             return redirect('reservations:artist_index')
+        else:
+            messages.error(request, "Échec de l'ajout d'un nouvel artiste !")
 
     return render(request, 'artist/create.html', {
         'form': form,
@@ -66,8 +70,11 @@ def artist_edit(request, id):
         if method == 'PUT':
             if form.is_valid():
                 form.save()
+                messages.success(request, "Artiste modifié avec succès.")
 
                 return redirect('reservations:show_artist', id=artist.id)
+            else:
+                messages.error(request, "Échec de la modification de l'artiste !")
 
     return render(request, 'artist/edit.html', {
         'form': form,
@@ -83,8 +90,11 @@ def artist_delete(request, id):
 
         if method == 'DELETE':
             artist.delete()
+            messages.success(request, "Artiste supprimé avec succès.")
 
             return redirect('reservations:artist_index')
+        else:
+            messages.error(request, "Échec de la suppression de l'artiste !")
 
     return render(request, 'artist/show.html', {
         'artist': artist,
