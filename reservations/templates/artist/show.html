@@ -16,5 +16,12 @@
 
     <div><a href="{% url 'reservations:artist_edit' artist.id %}">Modifier</a></div>
 
+    <form method="post" action="{% url 'reservations:artist_delete' artist.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
     <nav><a href="{% url 'reservations:artist_index' %}">Retour à l'index</a></nav>
 {% endblock %}

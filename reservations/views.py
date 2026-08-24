@@ -68,3 +68,19 @@ def artist_edit(request, id):
         'form': form,
         'artist': artist,
     })
+
+
+def artist_delete(request, id):
+    artist = get_object_or_404(Artist, id=id)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'DELETE':
+            artist.delete()
+
+            return redirect('reservations:artist_index')
+
+    return render(request, 'artist/show.html', {
+        'artist': artist,
+    })
