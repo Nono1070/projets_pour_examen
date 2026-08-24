@@ -7,11 +7,30 @@
 <body>
 <div class="container">
     <header>
+        <div style="float:right">
+            {% if request.user.is_authenticated %}
+            <p>Bonjour {{ request.user.username }} !</p>
+            <p><a href="{% url 'accounts:user-profile' %}">Mon profil</a></p>
+
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Se déconnecter</button>
+            </form>
+            {% else %}
+            <p>Vous n'êtes pas connecté.</p>
+            <p><a href="{% url 'login' %}">Se connecter</a></p>
+            <p><a href="{% url 'accounts:user-signup' %}">S'inscrire</a></p>
+            {% endif %}
+        </div>
+
         <nav>
             <a href="{% url 'reservations:index' %}">Accueil</a> |
             <a href="{% url 'reservations:artist_index' %}">Artistes</a> |
             <a href="{% url 'reservations:contact' %}">Contact</a> |
             <a href="{% url 'reservations:about' %}">À propos</a>
+            {% if request.user.is_superuser %}
+            | <a href="{% url 'admin:index' %}">Administration</a>
+            {% endif %}
         </nav>
     </header>
     <main>

@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+    <div>
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>Login : {{ user.username }}</p>
+        <p>Email : {{ user.email }}</p>
+        <p>Langue : {{ user_language }}</p>
+    </div>
+
+    <ul>
+        <li><a href="{% url 'accounts:user-update' user.id %}">Modifier</a></li>
+        <li>
+            <form method="post" action="{% url 'accounts:user-delete' user.id %}"
+                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')">
+                {% csrf_token %}
+                <button type="submit">Supprimer son compte</button>
+            </form>
+        </li>
+    </ul>
+{% endblock %}
