@@ -1,0 +1,18 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'un artiste{% endblock %}
+
+{% block content %}
+    <h2>{{ artist.firstname }} {{ artist.lastname }}</h2>
+
+    <h3>Types</h3>
+    <ul>
+    {% for type in artist.types.all %}
+        <li>{{ type.type }}</li>
+    {% empty %}
+        <li>Aucun type associé.</li>
+    {% endfor %}
+    </ul>
+
+    <nav><a href="{% url 'reservations:artist_index' %}">Retour à l'index</a></nav>
+{% endblock %}

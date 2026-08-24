@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Projet réservations - {% block title %}Bienvenue{% endblock %}</title>
+</head>
+<body>
+<div class="container">
+    <header>
+        <nav>
+            <a href="{% url 'reservations:index' %}">Accueil</a> |
+            <a href="{% url 'reservations:artist_index' %}">Artistes</a> |
+            <a href="{% url 'reservations:contact' %}">Contact</a> |
+            <a href="{% url 'reservations:about' %}">À propos</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>&copy; Projet Réservations</footer>
+</div>
+</body>
+</html>
