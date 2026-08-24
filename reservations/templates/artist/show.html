@@ -7,8 +7,8 @@
 
     <h3>Types</h3>
     <ul>
-    {% for type in artist.types.all %}
-        <li><a href="{% url 'reservations:artist_by_type' type.type %}">{{ type.type }}</a></li>
+    {% for artist_type in artist.a_artistTypes.all %}
+        <li><a href="{% url 'reservations:artist_by_type' artist_type.type.type %}">{{ artist_type.type.type }}</a></li>
     {% empty %}
         <li>Aucun type associé.</li>
     {% endfor %}

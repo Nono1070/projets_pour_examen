@@ -15,6 +15,12 @@ class Show(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    artist_types = models.ManyToManyField(
+        "ArtistType",
+        through="ArtistTypeShow",
+        related_name="shows",
+    )
+
     def __str__(self):
         return self.title
 

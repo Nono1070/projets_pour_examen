@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from .models import Artist, Type, Locality, Location, Show, UserMeta
+from .models import (
+    Artist, Type, Locality, Location, Show, UserMeta,
+    Representation, Review, ArtistType, ArtistTypeShow,
+)
 
 
 # Personnalisation de l'affichage pour Artist
@@ -22,6 +25,10 @@ admin.site.register(Type)
 admin.site.register(Locality)
 admin.site.register(Location)
 admin.site.register(Show, ShowAdmin)
+admin.site.register(Representation)
+admin.site.register(Review)
+admin.site.register(ArtistType)
+admin.site.register(ArtistTypeShow)
 
 admin.site.index_title = "Projet Réservations"
 admin.site.index_header = "Projet Réservations"

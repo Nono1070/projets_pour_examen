@@ -107,7 +107,7 @@ def artist_delete(request, id):
 
 
 def artist_by_type(request, type_name):
-    artists = Artist.objects.filter(types__type__iexact=type_name)
+    artists = Artist.objects.filter(a_artistTypes__type__type__iexact=type_name)
     title = f"Artistes de type : {type_name}"
 
     return render(request, 'artist/index.html', {
