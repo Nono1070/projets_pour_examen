@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'un type{% endblock %}
+
+{% block content %}
+    <h2>{{ type.type }}</h2>
+
+    <h3>Artistes</h3>
+    <ul>
+    {% for artist in type.artists.all %}
+        <li><a href="{% url 'reservations:show_artist' artist.id %}">{{ artist.firstname }} {{ artist.lastname }}</a></li>
+    {% empty %}
+        <li>Aucun artiste associé.</li>
+    {% endfor %}
+    </ul>
+
+    <div><a href="{% url 'reservations:type_edit' type.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:type_delete' type.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:type_index' %}">Retour à l'index</a></nav>
+{% endblock %}

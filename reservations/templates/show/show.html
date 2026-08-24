@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'un spectacle{% endblock %}
+
+{% block content %}
+    <h2>{{ show.title }}</h2>
+    <p>{{ show.description }}</p>
+    <p>Durée : {{ show.duration|default:"—" }} min</p>
+    <p>Prix : {{ show.price }}</p>
+    <p>Réservable : {{ show.bookable|yesno:"oui,non" }}</p>
+    <p>
+        Lieu :
+        {% if show.location %}
+            <a href="{% url 'reservations:show_location' show.location.id %}">{{ show.location.designation }}</a>
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <div><a href="{% url 'reservations:show_edit' show.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:show_delete' show.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:show_index' %}">Retour à l'index</a></nav>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Liste des lieux{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:location_create' %}">Ajouter</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Désignation</th><th>Adresse</th></tr>
+        </thead>
+        <tbody>
+        {% for location in locations %}
+            <tr>
+                <td><a href="{% url 'reservations:show_location' location.id %}">{{ location.designation }}</a></td>
+                <td>{{ location.address }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="2">Aucun lieu dans la base de données.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

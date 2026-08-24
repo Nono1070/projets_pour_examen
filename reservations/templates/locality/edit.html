@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Modifier une localité{% endblock %}
+
+{% block content %}
+    <h2>Modifier une localité</h2>
+
+    <form action="{% url 'reservations:locality_edit' locality.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="PUT">
+        {{ form }}
+        <button>Modifier</button>
+        <a href="{% url 'reservations:show_locality' locality.id %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:locality_index' %}">Retour à l'index</a></nav>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'un lieu{% endblock %}
+
+{% block content %}
+    <h2>{{ location.designation }}</h2>
+    <p>Adresse : {{ location.address }}</p>
+    <p>Téléphone : {{ location.phone }}</p>
+    <p>Site web : {{ location.website }}</p>
+
+    <h3>Spectacles à cet endroit</h3>
+    <ul>
+    {% for show in location.shows.all %}
+        <li><a href="{% url 'reservations:show_show' show.id %}">{{ show.title }}</a></li>
+    {% empty %}
+        <li>Aucun spectacle associé.</li>
+    {% endfor %}
+    </ul>
+
+    <div><a href="{% url 'reservations:location_edit' location.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:location_delete' location.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:location_index' %}">Retour à l'index</a></nav>
+{% endblock %}

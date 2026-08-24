@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Liste des types{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:type_create' %}">Ajouter</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Type</th></tr>
+        </thead>
+        <tbody>
+        {% for type in types %}
+            <tr><td><a href="{% url 'reservations:show_type' type.id %}">{{ type.type }}</a></td></tr>
+        {% empty %}
+            <tr><td>Aucun type dans la base de données.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Liste des spectacles{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:show_create' %}">Ajouter</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Titre</th><th>Lieu</th><th>Prix</th></tr>
+        </thead>
+        <tbody>
+        {% for show in shows %}
+            <tr>
+                <td><a href="{% url 'reservations:show_show' show.id %}">{{ show.title }}</a></td>
+                <td>{{ show.location.designation|default:"—" }}</td>
+                <td>{{ show.price }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Aucun spectacle dans la base de données.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

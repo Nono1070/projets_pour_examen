@@ -1,0 +1,18 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'une localité{% endblock %}
+
+{% block content %}
+    <h2>{{ locality.locality }} ({{ locality.postal_code }})</h2>
+
+    <div><a href="{% url 'reservations:locality_edit' locality.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:locality_delete' locality.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:locality_index' %}">Retour à l'index</a></nav>
+{% endblock %}
