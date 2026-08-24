@@ -10,5 +10,6 @@ urlpatterns = [
 
     path('artistes/', views.artist_index, name='artist_index'),
     path('artiste/create/', views.artist_create, name='artist_create'),
+    path('artiste/edit/<int:id>/', views.artist_edit, name='artist_edit'),
     path('artist/<int:id>/', views.show_artist, name='show_artist'),
 ]

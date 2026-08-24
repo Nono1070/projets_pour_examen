@@ -14,5 +14,7 @@
     {% endfor %}
     </ul>
 
+    <div><a href="{% url 'reservations:artist_edit' artist.id %}">Modifier</a></div>
+
     <nav><a href="{% url 'reservations:artist_index' %}">Retour à l'index</a></nav>
 {% endblock %}
