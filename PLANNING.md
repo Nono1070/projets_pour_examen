@@ -22,35 +22,33 @@ L'utilisateur souhaite une approche **progressive (crescendo)** et **théorique 
 
 ---
 
-## Prochaines Étapes : Maîtriser le Routage (URLs) et les Vues
+## Routage (URLs) et Vues — Niveaux 1 à 6 (Validés le 24/08/2026)
 
-Nous allons aborder la partie Frontend en suivant ce plan progressif strict :
+Toute la progression a été implémentée d'un coup par l'IA (à la demande explicite de l'utilisateur, qui teste en parallèle l'auto-complétion Copilot/VSCode) sur le modèle `Artist`, avec un commit git séparé et testé à chaque niveau. **Le mode théorie-avant-code n'a donc pas été respecté pour cette session** — à relire/expliquer ligne par ligne avec l'utilisateur avant de considérer ces niveaux réellement acquis.
 
-### Niveau 1 : L'URL statique et simple (Niveau Racine)
-- Création d'une page d'accueil basique (`path('', ...)`).
-- Comprendre comment la requête arrive dans une vue et renvoie un texte ou un template simple.
+- [x] **Niveau 1** : URL racine statique (`/`).
+- [x] **Niveau 2** : Délégation via `include('reservations.urls')` depuis `projet_reservation/urls.py`.
+- [x] **Niveau 3** : URL dynamique `artist/<int:id>/` → `show_artist`.
+- [x] **Niveau 4** : CRUD complet pour `Artist` — `ArtistForm` (ModelForm), templates (`layouts/base.html`, `artist/index.html`, `show.html`, `create.html`, `edit.html`), vues `artist_index`, `show_artist`, `artist_create`, `artist_edit`, `artist_delete`. Convention `_method` (PUT/DELETE) en champ caché de formulaire, comme dans le roadmap officiel.
+- [x] **Niveau 5** : URL avec paramètre string — `artistes/type/<str:type_name>/` → `artist_by_type`, filtre les artistes par type via la relation ManyToMany déjà en place.
+- [x] **Niveau 6** : Recherche par query string — `artistes/?q=...` filtre `artist_index` sur `lastname__icontains`.
 
-### Niveau 2 : La délégation (Include)
-- Comprendre pourquoi et comment on sépare le fichier `urls.py` du projet du fichier `urls.py` de l'application `reservations`.
-- Créer une route statique dans l'application (ex: `/artistes/`).
+Historique des commits (voir `git log`) :
+1. `Mise en place du projet Django, modeles de base (...) et routes niveau 1 a 3` — rattrapage du travail déjà fait mais jamais committé.
+2. `Vue Artist en templates (index et show) + layout de base`
+3. `Formulaire ArtistForm et vue de creation d'un artiste`
+4. `Vue de modification (edit) d'un artiste`
+5. `Vue de suppression (delete) d'un artiste`
+6. `Niveau 5 : filtre des artistes par type via parametre string dans l'URL`
+7. `Niveau 6 : recherche des artistes par nom via query string (?q=)`
 
-### Niveau 3 : L'URL dynamique (L'Identifiant)
-- Passer un paramètre technique simple dans l'URL.
-- Exemple : Afficher le détail d'un seul artiste via son ID/PK (`/artiste/<int:id>/`).
-- Comment la Vue récupère cet ID pour interroger la base de données.
+Environnement d'exécution : `..\python-3.12.0-embed-amd64\python.exe manage.py runserver` (Python embarqué sur la clé USB, voir `lancement_django.bat` à la racine de la clé) — pas de venv dans ce dossier.
 
-### Niveau 4 : Les URLs CRUD (Conventions)
-- Structurer les URLs selon les bonnes pratiques pour les opérations CRUD.
-- Exemple : `/artiste/create/`, `/artiste/edit/<int:id>/`, `/artiste/delete/<int:id>/`.
-
-### Niveau 5 : L'URL paramétrée complexe (Mots et SEO)
-- Passer des chaînes de caractères (strings) dans l'URL (comme l'examen 2022).
-- Exemple : Filtrer les spectacles par nom de salle (`/salle/<str:room_name>/`).
-
-### Niveau 6 : L'URL de Recherche (Query String)
-- La différence fondamentale avec les paramètres de route.
-- Comprendre l'usage du `?` dans l'URL pour les formulaires de recherche (`/spectacles/?q=theatre`).
-- Comment lire ces données dans la Vue (`request.GET`).
+## Prochaines étapes possibles
+- Reprendre chaque niveau avec l'utilisateur en mode théorie-avant-code (décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, etc.) pour combler l'écart créé par cette session accélérée.
+- Étendre le même pattern CRUD aux autres modèles (`Type`, `Locality`, `Location`, `Show`) si voulu.
+- Nettoyer le fichier `reservations/models.py` (vestige vide du `startapp`, coexistant avec le package `reservations/models/`).
+- Utiliser le contenu de `docs/` (`PID-WPWD2022.txt`, `WPWD2023SS.txt`, etc.) pour s'entraîner sur de vrais énoncés d'examen une fois les niveaux 1 à 6 maîtrisés en autonomie.
 
 ---
 *Ce document sert de fil rouge pour la prochaine session.*
