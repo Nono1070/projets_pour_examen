@@ -3,6 +3,7 @@ import io
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User
@@ -374,10 +375,41 @@ def location_delete(request, id):
 
 def show_index(request):
     shows = Show.objects.all()
+    title = 'Liste des spectacles'
+
+    query = request.GET.get('q')
+    if query:
+        shows = shows.filter(title__icontains=query)
+        title = f"Résultats pour « {query} »"
+
+    location_id = request.GET.get('location')
+    if location_id:
+        shows = shows.filter(location_id=location_id)
+
+    bookable = request.GET.get('bookable')
+    if bookable in ('1', '0'):
+        shows = shows.filter(bookable=(bookable == '1'))
+
+    sort_fields = {
+        'title': 'title',
+        'location': 'location__designation',
+        'bookable': 'bookable',
+        'price': 'price',
+    }
+    sort = request.GET.get('sort', 'title')
+    shows = shows.order_by(sort_fields.get(sort, 'title'))
+
+    paginator = Paginator(shows, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'show/index.html', {
-        'shows': shows,
-        'title': 'Liste des spectacles',
+        'shows': page_obj,
+        'title': title,
+        'query': query or '',
+        'locations': Location.objects.all(),
+        'selected_location': location_id or '',
+        'selected_bookable': bookable or '',
+        'sort': sort,
     })
 
 

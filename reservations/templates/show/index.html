@@ -5,9 +5,37 @@
 {% block content %}
     <h2>{{ title }}</h2>
 
+    <form method="get" action="{% url 'reservations:show_index' %}">
+        <input type="text" name="q" value="{{ query }}" placeholder="Rechercher par titre...">
+
+        <select name="location">
+            <option value="">Tous les lieux</option>
+            {% for location in locations %}
+            <option value="{{ location.id }}" {% if selected_location == location.id|stringformat:"s" %}selected{% endif %}>{{ location.designation }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="bookable">
+            <option value="">Réservable ou non</option>
+            <option value="1" {% if selected_bookable == "1" %}selected{% endif %}>Réservable</option>
+            <option value="0" {% if selected_bookable == "0" %}selected{% endif %}>Non réservable</option>
+        </select>
+
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <button type="submit">Filtrer</button>
+    </form>
+
     <ul>
         <li><a href="{% url 'reservations:show_create' %}">Ajouter</a></li>
     </ul>
+
+    <p>
+        Trier par :
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=title">Titre</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=location">Lieu</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=bookable">Réservable</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=price">Prix</a>
+    </p>
 
     <table>
         <thead>
@@ -25,4 +53,14 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <p>
+        {% if shows.has_previous %}
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort={{ sort }}&page={{ shows.previous_page_number }}">Précédent</a>
+        {% endif %}
+        Page {{ shows.number }} / {{ shows.paginator.num_pages }}
+        {% if shows.has_next %}
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort={{ sort }}&page={{ shows.next_page_number }}">Suivant</a>
+        {% endif %}
+    </p>
 {% endblock %}
