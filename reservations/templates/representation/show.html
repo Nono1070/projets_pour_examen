@@ -18,14 +18,18 @@
     <div><a href="{% url 'reservations:reservation_create' %}">Réserver</a></div>
     {% endif %}
 
+    {% if perms.reservations.change_representation %}
     <div><a href="{% url 'reservations:representation_edit' representation.id %}">Modifier</a></div>
+    {% endif %}
 
+    {% if perms.reservations.delete_representation %}
     <form method="post" action="{% url 'reservations:representation_delete' representation.id %}"
         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
         {% csrf_token %}
         <input type="hidden" name="_method" value="DELETE">
         <button>Supprimer</button>
     </form>
+    {% endif %}
 
     <nav><a href="{% url 'reservations:representation_index' %}">Retour à l'index</a></nav>
 {% endblock %}

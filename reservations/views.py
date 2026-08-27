@@ -127,6 +127,7 @@ def show_artist(request, id):
 
 
 @login_required
+@permission_required('reservations.add_artist', raise_exception=True)
 def artist_create(request):
     form = ArtistForm(request.POST or None)
 
@@ -145,6 +146,7 @@ def artist_create(request):
 
 
 @login_required
+@permission_required('reservations.change_artist', raise_exception=True)
 def artist_edit(request, id):
     # on récupère l'objet correspondant à l'id passé dans l'URL
     artist = get_object_or_404(Artist, id=id)
@@ -222,6 +224,7 @@ def show_type(request, id):
 
 
 @login_required
+@permission_required('reservations.add_type', raise_exception=True)
 def type_create(request):
     form = TypeForm(request.POST or None)
 
@@ -240,6 +243,7 @@ def type_create(request):
 
 
 @login_required
+@permission_required('reservations.change_type', raise_exception=True)
 def type_edit(request, id):
     type_ = get_object_or_404(Type, id=id)
     form = TypeForm(request.POST or None, instance=type_)
@@ -303,6 +307,7 @@ def show_locality(request, id):
 
 
 @login_required
+@permission_required('reservations.add_locality', raise_exception=True)
 def locality_create(request):
     form = LocalityForm(request.POST or None)
 
@@ -321,6 +326,7 @@ def locality_create(request):
 
 
 @login_required
+@permission_required('reservations.change_locality', raise_exception=True)
 def locality_edit(request, id):
     locality = get_object_or_404(Locality, id=id)
     form = LocalityForm(request.POST or None, instance=locality)
@@ -384,6 +390,7 @@ def show_location(request, id):
 
 
 @login_required
+@permission_required('reservations.add_location', raise_exception=True)
 def location_create(request):
     form = LocationForm(request.POST or None)
 
@@ -402,6 +409,7 @@ def location_create(request):
 
 
 @login_required
+@permission_required('reservations.change_location', raise_exception=True)
 def location_edit(request, id):
     location = get_object_or_404(Location, id=id)
     form = LocationForm(request.POST or None, instance=location)
@@ -460,6 +468,7 @@ def show_show(request, id):
 
 
 @login_required
+@permission_required('reservations.add_show', raise_exception=True)
 def show_create(request):
     form = ShowForm(request.POST or None)
 
@@ -478,6 +487,7 @@ def show_create(request):
 
 
 @login_required
+@permission_required('reservations.change_show', raise_exception=True)
 def show_edit(request, id):
     show = get_object_or_404(Show, id=id)
     form = ShowForm(request.POST or None, instance=show)
@@ -541,6 +551,7 @@ def show_representation(request, id):
 
 
 @login_required
+@permission_required('reservations.add_representation', raise_exception=True)
 def representation_create(request):
     form = RepresentationForm(request.POST or None)
 
@@ -559,6 +570,7 @@ def representation_create(request):
 
 
 @login_required
+@permission_required('reservations.change_representation', raise_exception=True)
 def representation_edit(request, id):
     representation = get_object_or_404(Representation, id=id)
     form = RepresentationForm(request.POST or None, instance=representation)

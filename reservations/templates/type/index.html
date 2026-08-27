@@ -5,9 +5,11 @@
 {% block content %}
     <h2>{{ title }}</h2>
 
+    {% if perms.reservations.add_type %}
     <ul>
         <li><a href="{% url 'reservations:type_create' %}">Ajouter</a></li>
     </ul>
+    {% endif %}
 
     <table>
         <thead>

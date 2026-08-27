@@ -14,14 +14,18 @@
     {% endfor %}
     </ul>
 
+    {% if perms.reservations.change_type %}
     <div><a href="{% url 'reservations:type_edit' type.id %}">Modifier</a></div>
+    {% endif %}
 
+    {% if perms.reservations.delete_type %}
     <form method="post" action="{% url 'reservations:type_delete' type.id %}"
         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
         {% csrf_token %}
         <input type="hidden" name="_method" value="DELETE">
         <button>Supprimer</button>
     </form>
+    {% endif %}
 
     <nav><a href="{% url 'reservations:type_index' %}">Retour à l'index</a></nav>
 {% endblock %}

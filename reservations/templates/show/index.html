@@ -25,9 +25,11 @@
         <button type="submit">Filtrer</button>
     </form>
 
+    {% if perms.reservations.add_show %}
     <ul>
         <li><a href="{% url 'reservations:show_create' %}">Ajouter</a></li>
     </ul>
+    {% endif %}
 
     <p>
         Trier par :

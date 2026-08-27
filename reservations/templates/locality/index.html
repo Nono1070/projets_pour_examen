@@ -5,9 +5,11 @@
 {% block content %}
     <h2>{{ title }}</h2>
 
+    {% if perms.reservations.add_locality %}
     <ul>
         <li><a href="{% url 'reservations:locality_create' %}">Ajouter</a></li>
     </ul>
+    {% endif %}
 
     <table>
         <thead>

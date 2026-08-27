@@ -5,14 +5,18 @@
 {% block content %}
     <h2>{{ locality.locality }} ({{ locality.postal_code }})</h2>
 
+    {% if perms.reservations.change_locality %}
     <div><a href="{% url 'reservations:locality_edit' locality.id %}">Modifier</a></div>
+    {% endif %}
 
+    {% if perms.reservations.delete_locality %}
     <form method="post" action="{% url 'reservations:locality_delete' locality.id %}"
         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
         {% csrf_token %}
         <input type="hidden" name="_method" value="DELETE">
         <button>Supprimer</button>
     </form>
+    {% endif %}
 
     <nav><a href="{% url 'reservations:locality_index' %}">Retour à l'index</a></nav>
 {% endblock %}

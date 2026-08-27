@@ -5,9 +5,11 @@
 {% block content %}
     <h2>{{ title }}</h2>
 
+    {% if perms.reservations.add_pressarticle %}
     <ul>
         <li><a href="{% url 'reservations:press_article_create' %}">Soumettre un article</a></li>
     </ul>
+    {% endif %}
 
     <table>
         <thead>
