@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Sum, F
+from django.utils import timezone
 
 from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle
 from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
@@ -35,7 +36,18 @@ def accept_cookies(request):
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    shows = Show.objects.all().order_by('title')
+
+    shows_with_next = []
+    for show in shows:
+        shows_with_next.append({
+            'show': show,
+            'next_representation': show.representations.filter(schedule__gte=timezone.now()).order_by('schedule').first(),
+        })
+
+    return render(request, 'index.html', {
+        'shows_with_next': shows_with_next,
+    })
 
 def contact(request):
     return render(request, 'contact.html')

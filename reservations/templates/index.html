@@ -4,5 +4,32 @@
 
 {% block content %}
     <h1>Accueil</h1>
-    <p>Bienvenue sur notre site.</p>
+    <p>Bienvenue sur notre site. Découvrez notre catalogue de spectacles ci-dessous.</p>
+
+    <h2>Catalogue des spectacles</h2>
+
+    <table>
+        <thead>
+            <tr><th>Titre</th><th>Lieu</th><th>Prochaine représentation</th></tr>
+        </thead>
+        <tbody>
+        {% for entry in shows_with_next %}
+            <tr>
+                <td><a href="{% url 'reservations:show_show' entry.show.id %}">{{ entry.show.title }}</a></td>
+                <td>{{ entry.show.location.designation|default:"—" }}</td>
+                <td>
+                    {% if entry.next_representation %}
+                        {{ entry.next_representation.schedule }}
+                    {% else %}
+                        Aucune représentation programmée
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Aucun spectacle dans la base de données.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="{% url 'reservations:show_index' %}">Voir tout le catalogue (recherche, tri, filtres)</a></p>
 {% endblock %}
