@@ -12,6 +12,7 @@
 
     <ul>
         <li><a href="{% url 'accounts:user-update' user.id %}">Modifier</a></li>
+        <li><a href="{% url 'password_change' %}">Changer mon mot de passe</a></li>
         <li>
             <form method="post" action="{% url 'accounts:user-delete' user.id %}"
                 onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')">
