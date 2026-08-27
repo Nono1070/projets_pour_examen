@@ -35,6 +35,14 @@ class UserSignUpForm(UserCreationForm):
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Cet email est déjà utilisé par un autre compte.")
+
+        return email
+
     class Meta:
         model = User
 
