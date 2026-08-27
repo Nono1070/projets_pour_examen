@@ -98,15 +98,25 @@ Environnement d'exécution : `..\python-3.12.0-embed-amd64\python.exe manage.py 
 - [x] Données de démonstration ajoutées (1 localité, 1 lieu, 2 spectacles avec prix, 2 représentations) pour pouvoir tester réellement l'application (la base ne contenait avant que les artistes/types).
 - [x] **Bug corrigé** : les vues `index`, `contact` et `about` (`reservations/views.py`) étaient encore de vieux vestiges du chapitre 1 (routage niveau 1) — un `HttpResponse` codé en dur, sans passer par `layouts/base.html`. Conséquence : le menu de connexion/navigation n'apparaissait pas sur ces 3 pages, contrairement à toutes les autres. Corrigé en les convertissant en `render()` avec des templates minimalistes (`templates/index.html`, `contact.html`, `about.html`, chacun `extends 'layouts/base.html'`).
 
+## Formulaires : séparation des champs (27/08/2026)
+- [x] Tous les formulaires (`{{ form }}` brut, sans structure) remplacés par `<table>{{ form.as_table }}</table>` — un champ par ligne, toujours zéro CSS, même principe que les formulaires de mot de passe déjà écrits ainsi. 18 templates concernés (CRUD Artist/Type/Locality/Location/Show/Representation/Review/Reservation, inscription, modification de profil).
+
+## Dashboard admin (27/08/2026)
+- [x] Nouvelle page `reservations:dashboard` (`/dashboard/`), réservée aux membres du groupe ADMIN ou superuser (`user_passes_test(is_admin)`, `is_admin` défini dans `reservations/views.py`) : compteurs de tout le catalogue (artistes, types, localités, lieux, spectacles, représentations, réservations, critiques dont en attente, membres), liens rapides vers la gestion de chaque contenu, et liste des critiques en attente de modération avec bouton « Valider » direct (réutilise `review_validate`).
+- Lien « Tableau de bord » ajouté dans la nav (`layouts/base.html`), visible via `perms.reservations.add_show` (permission que seul le groupe ADMIN possède, MEMBER n'a que des `view_*`) ou `is_superuser` — même logique que le lien Administration existant vers `/admin/`.
+- **Écart volontaire par rapport au cahier des charges (PID)** : le PID décrit un back-office bien plus large (CRUD via un progiciel tiers, import/export CSV, mise à jour via un web service tiers, statistiques de vente par producteur, rôles critique de presse/producteur, API affiliés à paliers Free/Starter/Premium, flux RSS, bandeau cookies...). Seuls le dashboard et la clarté des formulaires ont été demandés explicitement pour cette session ; le reste du PID reste hors scope (voir « Ce qui reste »).
+
 ## Ce qui reste
 - CRUD `ArtistType`/`ArtistTypeShow` uniquement via Django Admin pour l'instant (pas de vues frontend dédiées — cohérent avec le roadmap, qui ne le demande pas non plus).
 - Fixtures/données de test et clés naturelles (`natural_key`, `get_by_natural_key`) : volontairement non implémentées (sert uniquement à l'export/import JSON des données de test, pas à l'app elle-même).
 - Modèle `Price` séparé : volontairement non implémenté (voir écart documenté ci-dessus).
 - Authentification API par JWT, tests automatisés DRF, documentation Swagger : volontairement non implémentés (voir chapitre 8 ci-dessus, tous marqués optionnels/TODO dans le roadmap lui-même).
+- Fonctionnalités du PID hors scope pour l'instant (volontairement, à discuter si demandées explicitement) : flux RSS, import/export CSV, intégration d'un web service tiers pour mettre à jour le catalogue, API affiliés à paliers (Free/Starter/Premium), rôle critique de presse (soumission d'articles), rôle producteur (statistiques de vente, modération dédiée), pagination/tri/filtres avancés sur les listes du catalogue (au-delà de la recherche par nom déjà en place sur Artist), bandeau de consentement cookies.
 
 ## Prochaines étapes possibles
-- Reprendre **chaque** chapitre ci-dessus avec l'utilisateur en mode théorie-avant-code : décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, `login_required`/`permission_required`, le modèle pivot `ArtistType`/`ArtistTypeShow`, le modèle `Reservation`, les permissions DRF, etc. **Tout ce qui est coché [x] a été écrit par l'IA en sessions accélérées, à la demande explicite de l'utilisateur — rien n'est encore réellement appris.**
+- Reprendre **chaque** chapitre ci-dessus avec l'utilisateur en mode théorie-avant-code : décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, `login_required`/`permission_required`, le modèle pivot `ArtistType`/`ArtistTypeShow`, le modèle `Reservation`, les permissions DRF, le dashboard admin, etc. **Tout ce qui est coché [x] a été écrit par l'IA en sessions accélérées, à la demande explicite de l'utilisateur — rien n'est encore réellement appris.**
 - Utiliser le contenu de `docs/` (`PID-WPWD2022.txt`, `WPWD2023SS.txt`, etc.) pour s'entraîner sur de vrais énoncés d'examen une fois le socle ci-dessus maîtrisé en autonomie.
+- Si l'utilisateur veut aller plus loin dans le cahier des charges (PID), négocier explicitement quelle(s) fonctionnalité(s) précise(s) parmi celles listées dans « Ce qui reste » avant de les implémenter — le PID est un document générique très large (10 itérations), pas un scope validé pour ce projet.
 
 ---
 *Ce document sert de fil rouge pour la prochaine session.*
