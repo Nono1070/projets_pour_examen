@@ -17,6 +17,21 @@ def is_admin(user):
     return user.is_superuser or user.groups.filter(name='ADMIN').exists()
 
 
+COOKIE_CONSENT_NAME = 'cookie_consent'
+COOKIE_CONSENT_MAX_AGE = 60 * 60 * 24 * 365
+
+
+def accept_cookies(request):
+    if request.method == 'POST':
+        redirect_to = request.POST.get('next') or 'reservations:index'
+        response = redirect(redirect_to)
+        response.set_cookie(COOKIE_CONSENT_NAME, '1', max_age=COOKIE_CONSENT_MAX_AGE)
+
+        return response
+
+    return redirect('reservations:index')
+
+
 # Create your views here.
 def index(request):
     return render(request, 'index.html')

@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
     path('about/', views.about, name='about'),
+    path('cookies/accepter/', views.accept_cookies, name='accept_cookies'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/export/', views.export_shows_csv, name='export_shows_csv'),
     path('dashboard/import/', views.import_shows_csv, name='import_shows_csv'),

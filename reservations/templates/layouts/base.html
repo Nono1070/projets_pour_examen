@@ -63,6 +63,17 @@
         {% block content %}{% endblock %}
     </main>
     <footer>&copy; Projet Réservations | <a href="{% url 'reservations:representations_feed' %}">Flux RSS des représentations</a></footer>
+
+    {% if not request.COOKIES.cookie_consent %}
+    <div id="cookie-banner">
+        <p>Ce site utilise des cookies nécessaires à son fonctionnement (session, préférences).</p>
+        <form method="post" action="{% url 'reservations:accept_cookies' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit">Accepter</button>
+        </form>
+    </div>
+    {% endif %}
 </div>
 </body>
 </html>
