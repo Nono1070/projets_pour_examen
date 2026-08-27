@@ -17,6 +17,15 @@
         <tr><th>Membres</th><td>{{ counts.members }}</td></tr>
     </table>
 
+    <h3>Import / export du catalogue de spectacles (CSV)</h3>
+    <p><a href="{% url 'reservations:export_shows_csv' %}">Exporter les spectacles en CSV</a></p>
+    <form method="post" action="{% url 'reservations:import_shows_csv' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="csv_file" accept=".csv">
+        <button type="submit">Importer un CSV de spectacles</button>
+    </form>
+    <p>Colonnes attendues : title, slug, description, poster_url, duration, location (slug), bookable, price.</p>
+
     <h3>Gestion du catalogue</h3>
     <nav>
         <a href="{% url 'reservations:artist_index' %}">Artistes</a> |

@@ -1,4 +1,8 @@
+import csv
+import io
+
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User
@@ -733,6 +737,69 @@ def dashboard(request):
         },
         'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
     })
+
+
+@login_required
+@user_passes_test(is_admin)
+def export_shows_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="spectacles.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['title', 'slug', 'description', 'poster_url', 'duration', 'location', 'bookable', 'price'])
+
+    for show in Show.objects.all():
+        writer.writerow([
+            show.title,
+            show.slug or '',
+            show.description,
+            show.poster_url,
+            show.duration or '',
+            show.location.slug if show.location else '',
+            show.bookable,
+            show.price,
+        ])
+
+    return response
+
+
+@login_required
+@user_passes_test(is_admin)
+def import_shows_csv(request):
+    if request.method == 'POST':
+        csv_file = request.FILES.get('csv_file')
+
+        if not csv_file:
+            messages.error(request, "Aucun fichier sélectionné !")
+            return redirect('reservations:dashboard')
+
+        reader = csv.DictReader(io.StringIO(csv_file.read().decode('utf-8')))
+        created, updated = 0, 0
+
+        for row in reader:
+            location = Location.objects.filter(slug=row.get('location')).first() if row.get('location') else None
+
+            show, was_created = Show.objects.update_or_create(
+                title=row['title'],
+                defaults={
+                    'slug': row.get('slug') or None,
+                    'description': row.get('description', ''),
+                    'poster_url': row.get('poster_url', ''),
+                    'duration': row.get('duration') or None,
+                    'location': location,
+                    'bookable': row.get('bookable', '').strip().lower() in ('true', '1', 'oui'),
+                    'price': row.get('price') or 0,
+                },
+            )
+
+            if was_created:
+                created += 1
+            else:
+                updated += 1
+
+        messages.success(request, f"Import terminé : {created} spectacle(s) créé(s), {updated} mis à jour.")
+
+    return redirect('reservations:dashboard')
 
 
 # --- PressArticle (critique de presse) ---
