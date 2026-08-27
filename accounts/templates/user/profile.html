@@ -29,11 +29,16 @@
     </p>
     <p><a href="{% url 'reservations:reservation_index' %}">Voir mes réservations</a></p>
 
-    <h3>Mes critiques et articles</h3>
-    <p>{{ reviews_count }} critique(s) postée(s).</p>
+    <h3>Mes commentaires (avis + étoiles, visibles sur la fiche du spectacle)</h3>
+    <p>{{ reviews_count }} commentaire(s) posté(s) sur des spectacles réservés.</p>
+    <p><a href="{% url 'reservations:review_create' %}">Poster un commentaire sur un spectacle réservé</a></p>
+
+    <h3>Mes articles de presse (avec photo, visibles dans « Critiques presse »)</h3>
     <p>{{ press_articles_count }} article(s) de presse soumis.</p>
     <p>
-        <a href="{% url 'reservations:review_create' %}">Poster une critique</a> |
+        {% if perms.reservations.add_pressarticle %}
+        <a href="{% url 'reservations:press_article_create' %}">Soumettre un article de presse</a> |
+        {% endif %}
         <a href="{% url 'reservations:press_article_index' %}">Voir les articles de presse</a>
     </p>
 
