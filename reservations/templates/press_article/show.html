@@ -1,16 +1,27 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %}Article de presse{% endblock %}
+{% block title %}{{ article.title }}{% endblock %}
 
 {% block content %}
-    <h2>{{ article.title }}</h2>
-    <p>Spectacle : <a href="{% url 'reservations:show_show' article.show.id %}">{{ article.show.title }}</a></p>
-    <p>Critique : {{ article.critic.username }}</p>
-    <p>{{ article.content }}</p>
-    {% if article.url %}
-    <p>Lien : <a href="{{ article.url }}">{{ article.url }}</a></p>
-    {% endif %}
-    <p>Statut : {{ article.published|yesno:"publié,en attente de publication" }}</p>
+    <article>
+        <header>
+            <h2>{{ article.title }}</h2>
+            <p>Par {{ article.critic.username }} — {{ article.created_at }}</p>
+            <p>Spectacle : <a href="{% url 'reservations:show_show' article.show.id %}">{{ article.show.title }}</a></p>
+        </header>
+
+        {% if article.photo_url %}
+        <p><img src="{{ article.photo_url }}" alt="{{ article.title }}" width="400"></p>
+        {% endif %}
+
+        <div>{{ article.content|linebreaks }}</div>
+
+        {% if article.url %}
+        <p>Lien : <a href="{{ article.url }}">{{ article.url }}</a></p>
+        {% endif %}
+
+        <p>Statut : {{ article.published|yesno:"publié,en attente de publication" }}</p>
+    </article>
 
     {% if request.user == article.critic %}
     <div><a href="{% url 'reservations:press_article_edit' article.id %}">Modifier</a></div>

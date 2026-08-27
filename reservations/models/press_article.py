@@ -8,6 +8,7 @@ class PressArticle(models.Model):
     critic = models.ForeignKey(User, on_delete=models.RESTRICT, null=False, related_name='press_articles')
     show = models.ForeignKey(Show, on_delete=models.RESTRICT, null=False, related_name='press_articles')
     title = models.CharField(max_length=255)
+    photo_url = models.CharField(max_length=255, blank=True)
     content = models.TextField(blank=True)
     url = models.CharField(max_length=255, blank=True)
     published = models.BooleanField(default=False)

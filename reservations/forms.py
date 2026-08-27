@@ -131,6 +131,7 @@ class PressArticleForm(forms.ModelForm):
         fields = [
             'show',
             'title',
+            'photo_url',
             'content',
             'url',
         ]

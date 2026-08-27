@@ -41,7 +41,10 @@
     <ul>
     {% for article in show.press_articles.all %}
         {% if article.published %}
-        <li><a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }} — {{ article.critic.username }}</a></li>
+        <li>
+            {% if article.photo_url %}<img src="{{ article.photo_url }}" alt="{{ article.title }}" width="60">{% endif %}
+            <a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }} — {{ article.critic.username }}</a>
+        </li>
         {% endif %}
     {% empty %}
         <li>Aucun article de presse pour le moment.</li>
