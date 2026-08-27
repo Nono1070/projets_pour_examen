@@ -670,6 +670,7 @@ def review_index(request):
     return render(request, 'review/index.html', {
         'reviews': reviews,
         'title': 'Liste des critiques',
+        'can_review': request.user.is_authenticated and Reservation.objects.filter(user=request.user).exists(),
     })
 
 

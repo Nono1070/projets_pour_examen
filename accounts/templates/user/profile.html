@@ -31,7 +31,11 @@
 
     <h3>Mes commentaires (avis + étoiles, visibles sur la fiche du spectacle)</h3>
     <p>{{ reviews_count }} commentaire(s) posté(s) sur des spectacles réservés.</p>
+    {% if reservations_count %}
     <p><a href="{% url 'reservations:review_create' %}">Poster un commentaire sur un spectacle réservé</a></p>
+    {% else %}
+    <p>Réservez une place pour un spectacle avant de pouvoir le commenter.</p>
+    {% endif %}
 
     <h3>Mes articles de presse (avec photo, visibles dans « Critiques presse »)</h3>
     <p>{{ press_articles_count }} article(s) de presse soumis.</p>

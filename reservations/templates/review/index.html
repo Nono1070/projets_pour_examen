@@ -5,7 +5,7 @@
 {% block content %}
     <h2>{{ title }}</h2>
 
-    {% if request.user.is_authenticated %}
+    {% if can_review %}
     <ul>
         <li><a href="{% url 'reservations:review_create' %}">Ajouter une critique</a></li>
     </ul>
