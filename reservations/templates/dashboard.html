@@ -73,6 +73,28 @@
     <p>Aucune critique en attente.</p>
     {% endif %}
 
+    <h3>Articles de presse en attente de publication</h3>
+    {% if pending_press_articles %}
+    <table border="1" cellspacing="0">
+        <tr><th>Critique</th><th>Spectacle</th><th>Titre</th><th>Action</th></tr>
+        {% for article in pending_press_articles %}
+        <tr>
+            <td>{{ article.critic.username }}</td>
+            <td>{{ article.show.title }}</td>
+            <td><a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }}</a></td>
+            <td>
+                <form method="post" action="{% url 'reservations:press_article_publish' article.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Publier</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucun article en attente.</p>
+    {% endif %}
+
     <h3>Demandes de rôle en attente</h3>
     {% if pending_role_requests %}
     <table border="1" cellspacing="0">

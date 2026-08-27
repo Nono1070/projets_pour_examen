@@ -39,7 +39,7 @@
             <p>Bonjour {{ request.user.username }} !</p>
             <p><a href="{% url 'accounts:user-profile' %}">Mon profil</a></p>
             <p><a href="{% url 'reservations:reservation_index' %}">Mes réservations</a></p>
-            {% if request.user.is_superuser or perms.reservations.change_review %}
+            {% if user_is_producer %}
             <p><a href="{% url 'reservations:producer_dashboard' %}">Espace producteur</a></p>
             {% endif %}
             {% if request.user.is_superuser or perms.reservations.add_show %}

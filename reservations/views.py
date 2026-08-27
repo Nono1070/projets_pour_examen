@@ -707,6 +707,11 @@ def review_delete(request, id):
 @permission_required('reservations.change_review', raise_exception=True)
 def review_validate(request, id):
     review = get_object_or_404(Review, id=id)
+    is_producer_of_show = review.show.producer_id == request.user.id
+
+    if not (is_producer_of_show or is_admin(request.user)):
+        messages.error(request, "Vous n'avez pas l'autorisation de modérer cette critique !")
+        return redirect('reservations:show_review', id=review.id)
 
     if request.method == 'POST':
         review.validated = True
@@ -822,6 +827,7 @@ def dashboard(request):
             'members': User.objects.count(),
         },
         'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
+        'pending_press_articles': PressArticle.objects.filter(published=False).order_by('-created_at')[:10],
         'pending_role_requests': RoleRequest.objects.filter(status=RoleRequest.Status.PENDING),
     })
 
@@ -1008,6 +1014,7 @@ def press_article_publish(request, id):
 # --- Espace producteur ---
 
 @login_required
+@user_passes_test(is_producer)
 def producer_dashboard(request):
     shows = Show.objects.filter(producer=request.user)
 
