@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import (
     Artist, Type, Locality, Location, Show, UserMeta,
     Representation, Review, ArtistType, ArtistTypeShow,
-    Reservation, PressArticle,
+    Reservation, PressArticle, RoleRequest,
 )
 
 
@@ -32,6 +32,7 @@ admin.site.register(ArtistType)
 admin.site.register(ArtistTypeShow)
 admin.site.register(Reservation)
 admin.site.register(PressArticle)
+admin.site.register(RoleRequest)
 
 admin.site.index_title = "Projet Réservations"
 admin.site.index_header = "Projet Réservations"

@@ -14,6 +14,7 @@ class Show(models.Model):
     bookable = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=False, blank=True)
     producer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='produced_shows')
+    published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
