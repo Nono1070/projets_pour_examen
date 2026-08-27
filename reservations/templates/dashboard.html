@@ -26,6 +26,13 @@
     </form>
     <p>Colonnes attendues : title, slug, description, poster_url, duration, location (slug), bookable, price.</p>
 
+    <h3>Synchronisation avec un web service tiers</h3>
+    <form method="post" action="{% url 'reservations:sync_shows_webservice' %}">
+        {% csrf_token %}
+        <button type="submit">Synchroniser le catalogue depuis le web service</button>
+    </form>
+    <p>Nécessite settings.THIRD_PARTY_CATALOG_API_URL (aucun fournisseur réel branché par défaut).</p>
+
     <h3>Gestion du catalogue</h3>
     <nav>
         <a href="{% url 'reservations:artist_index' %}">Artistes</a> |

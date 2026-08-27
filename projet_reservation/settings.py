@@ -154,3 +154,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
 }
+
+# Web service tiers pour mettre a jour le catalogue de spectacles (PID).
+# Vide par defaut : aucun fournisseur reel n'est branche. Doit repondre en
+# JSON avec une liste de {title, description, poster_url, bookable, price}.
+THIRD_PARTY_CATALOG_API_URL = ''

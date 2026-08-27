@@ -11,6 +11,7 @@ from django.db.models import Sum, F
 
 from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle
 from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
+from .webservice import sync_shows_from_webservice, WebserviceSyncError
 
 
 def is_admin(user):
@@ -845,6 +846,19 @@ def import_shows_csv(request):
                 updated += 1
 
         messages.success(request, f"Import terminé : {created} spectacle(s) créé(s), {updated} mis à jour.")
+
+    return redirect('reservations:dashboard')
+
+
+@login_required
+@user_passes_test(is_admin)
+def sync_shows_webservice(request):
+    if request.method == 'POST':
+        try:
+            created, updated = sync_shows_from_webservice()
+            messages.success(request, f"Synchronisation terminée : {created} créé(s), {updated} mis à jour.")
+        except WebserviceSyncError as error:
+            messages.error(request, str(error))
 
     return redirect('reservations:dashboard')
 
