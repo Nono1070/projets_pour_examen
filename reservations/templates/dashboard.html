@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+    <h2>Tableau de bord</h2>
+
+    <table>
+        <tr><th>Artistes</th><td>{{ counts.artists }}</td></tr>
+        <tr><th>Types</th><td>{{ counts.types }}</td></tr>
+        <tr><th>Localités</th><td>{{ counts.localities }}</td></tr>
+        <tr><th>Lieux</th><td>{{ counts.locations }}</td></tr>
+        <tr><th>Spectacles</th><td>{{ counts.shows }}</td></tr>
+        <tr><th>Représentations</th><td>{{ counts.representations }}</td></tr>
+        <tr><th>Réservations</th><td>{{ counts.reservations }}</td></tr>
+        <tr><th>Critiques</th><td>{{ counts.reviews }} ({{ counts.reviews_pending }} à modérer)</td></tr>
+        <tr><th>Membres</th><td>{{ counts.members }}</td></tr>
+    </table>
+
+    <h3>Gestion du catalogue</h3>
+    <nav>
+        <a href="{% url 'reservations:artist_index' %}">Artistes</a> |
+        <a href="{% url 'reservations:type_index' %}">Types</a> |
+        <a href="{% url 'reservations:locality_index' %}">Localités</a> |
+        <a href="{% url 'reservations:location_index' %}">Lieux</a> |
+        <a href="{% url 'reservations:show_index' %}">Spectacles</a> |
+        <a href="{% url 'reservations:representation_index' %}">Représentations</a> |
+        <a href="{% url 'reservations:review_index' %}">Critiques</a>
+    </nav>
+
+    <h3>Critiques en attente de modération</h3>
+    {% if pending_reviews %}
+    <table>
+        <tr>
+            <th>Membre</th>
+            <th>Spectacle</th>
+            <th>Note</th>
+            <th>Critique</th>
+            <th>Action</th>
+        </tr>
+        {% for review in pending_reviews %}
+        <tr>
+            <td>{{ review.user.username }}</td>
+            <td><a href="{% url 'reservations:show_show' review.show.id %}">{{ review.show.title }}</a></td>
+            <td>{{ review.stars }}</td>
+            <td>{{ review.review }}</td>
+            <td>
+                <form method="post" action="{% url 'reservations:review_validate' review.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Valider</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucune critique en attente.</p>
+    {% endif %}
+{% endblock %}

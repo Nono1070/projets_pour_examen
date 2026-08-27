@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.models import User
 
 from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation
 from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm
+
+
+def is_admin(user):
+    return user.is_superuser or user.groups.filter(name='ADMIN').exists()
+
 
 # Create your views here.
 def index(request):
@@ -703,4 +709,26 @@ def reservation_delete(request, id):
 
     return render(request, 'reservation/show.html', {
         'reservation': reservation,
+    })
+
+
+# --- Dashboard admin ---
+
+@login_required
+@user_passes_test(is_admin)
+def dashboard(request):
+    return render(request, 'dashboard.html', {
+        'counts': {
+            'artists': Artist.objects.count(),
+            'types': Type.objects.count(),
+            'localities': Locality.objects.count(),
+            'locations': Location.objects.count(),
+            'shows': Show.objects.count(),
+            'representations': Representation.objects.count(),
+            'reservations': Reservation.objects.count(),
+            'reviews': Review.objects.count(),
+            'reviews_pending': Review.objects.filter(validated=False).count(),
+            'members': User.objects.count(),
+        },
+        'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
     })

@@ -37,6 +37,9 @@
             {% endif %}
             <a href="{% url 'reservations:contact' %}">Contact</a> |
             <a href="{% url 'reservations:about' %}">À propos</a>
+            {% if request.user.is_superuser or perms.reservations.add_show %}
+            | <a href="{% url 'reservations:dashboard' %}">Tableau de bord</a>
+            {% endif %}
             {% if request.user.is_superuser %}
             | <a href="{% url 'admin:index' %}">Administration</a>
             {% endif %}
