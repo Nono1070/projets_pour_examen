@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Article de presse{% endblock %}
+
+{% block content %}
+    <h2>{{ article.title }}</h2>
+    <p>Spectacle : <a href="{% url 'reservations:show_show' article.show.id %}">{{ article.show.title }}</a></p>
+    <p>Critique : {{ article.critic.username }}</p>
+    <p>{{ article.content }}</p>
+    {% if article.url %}
+    <p>Lien : <a href="{{ article.url }}">{{ article.url }}</a></p>
+    {% endif %}
+    <p>Statut : {{ article.published|yesno:"publié,en attente de publication" }}</p>
+
+    {% if request.user == article.critic %}
+    <div><a href="{% url 'reservations:press_article_edit' article.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:press_article_delete' article.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Supprimer</button>
+    </form>
+    {% endif %}
+
+    {% if not article.published and request.user.id == article.show.producer_id or not article.published and request.user.is_superuser %}
+    <form method="post" action="{% url 'reservations:press_article_publish' article.id %}">
+        {% csrf_token %}
+        <button>Publier cet article</button>
+    </form>
+    {% endif %}
+
+    <nav><a href="{% url 'reservations:press_article_index' %}">Retour à l'index</a></nav>
+{% endblock %}

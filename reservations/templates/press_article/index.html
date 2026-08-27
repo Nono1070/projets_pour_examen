@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Critiques de presse{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:press_article_create' %}">Soumettre un article</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Spectacle</th><th>Titre</th><th>Critique</th></tr>
+        </thead>
+        <tbody>
+        {% for article in articles %}
+            <tr>
+                <td><a href="{% url 'reservations:show_show' article.show.id %}">{{ article.show.title }}</a></td>
+                <td><a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }}</a></td>
+                <td>{{ article.critic.username }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Aucun article publié pour le moment.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.models import User
+from django.db.models import Sum, F
 
-from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation
-from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm
+from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle
+from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
 
 
 def is_admin(user):
@@ -731,4 +732,132 @@ def dashboard(request):
             'members': User.objects.count(),
         },
         'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
+    })
+
+
+# --- PressArticle (critique de presse) ---
+
+def press_article_index(request):
+    articles = PressArticle.objects.filter(published=True)
+
+    return render(request, 'press_article/index.html', {
+        'articles': articles,
+        'title': 'Critiques de presse',
+    })
+
+
+def show_press_article(request, id):
+    article = get_object_or_404(PressArticle, id=id)
+
+    return render(request, 'press_article/show.html', {
+        'article': article,
+    })
+
+
+@login_required
+@permission_required('reservations.add_pressarticle', raise_exception=True)
+def press_article_create(request):
+    form = PressArticleForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.critic = request.user
+            article.published = False
+            article.save()
+            messages.success(request, "Article envoyé avec succès, en attente de publication par le producteur.")
+
+            return redirect('reservations:press_article_index')
+        else:
+            messages.error(request, "Échec de l'envoi de l'article !")
+
+    return render(request, 'press_article/create.html', {
+        'form': form,
+    })
+
+
+@login_required
+def press_article_edit(request, id):
+    article = get_object_or_404(PressArticle, id=id, critic=request.user)
+    form = PressArticleForm(request.POST or None, instance=article)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'PUT':
+            if form.is_valid():
+                article = form.save(commit=False)
+                article.published = False
+                article.save()
+                messages.success(request, "Article modifié avec succès, en attente de nouvelle publication.")
+
+                return redirect('reservations:show_press_article', id=article.id)
+            else:
+                messages.error(request, "Échec de la modification de l'article !")
+
+    return render(request, 'press_article/edit.html', {
+        'form': form,
+        'article': article,
+    })
+
+
+@login_required
+def press_article_delete(request, id):
+    article = get_object_or_404(PressArticle, id=id, critic=request.user)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'DELETE':
+            article.delete()
+            messages.success(request, "Article supprimé avec succès.")
+
+            return redirect('reservations:press_article_index')
+        else:
+            messages.error(request, "Échec de la suppression de l'article !")
+
+    return render(request, 'press_article/show.html', {
+        'article': article,
+    })
+
+
+@login_required
+def press_article_publish(request, id):
+    article = get_object_or_404(PressArticle, id=id)
+    is_producer_of_show = article.show.producer_id == request.user.id
+
+    if not (is_producer_of_show or is_admin(request.user)):
+        messages.error(request, "Vous n'avez pas l'autorisation de publier cet article !")
+        return redirect('reservations:show_press_article', id=article.id)
+
+    if request.method == 'POST':
+        article.published = True
+        article.save()
+        messages.success(request, "Article publié avec succès.")
+
+    return redirect('reservations:show_press_article', id=article.id)
+
+
+# --- Espace producteur ---
+
+@login_required
+def producer_dashboard(request):
+    shows = Show.objects.filter(producer=request.user)
+
+    shows_stats = []
+    for show in shows:
+        stats = Reservation.objects.filter(representation__show=show).aggregate(
+            total_quantity=Sum('quantity'),
+            total_revenue=Sum(F('quantity') * F('price')),
+        )
+        shows_stats.append({
+            'show': show,
+            'total_quantity': stats['total_quantity'] or 0,
+            'total_revenue': stats['total_revenue'] or 0,
+        })
+
+    return render(request, 'producer_dashboard.html', {
+        'shows_stats': shows_stats,
+        'pending_reviews': Review.objects.filter(show__producer=request.user, validated=False),
+        'pending_articles': PressArticle.objects.filter(show__producer=request.user, published=False),
     })

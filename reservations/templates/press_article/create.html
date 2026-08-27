@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Soumettre un article{% endblock %}
+
+{% block content %}
+    <h2>Soumettre un article de presse</h2>
+
+    <form action="{% url 'reservations:press_article_create' %}" method="post">
+        {% csrf_token %}
+        <table>{{ form.as_table }}</table>
+        <button>Envoyer</button>
+        <a href="{% url 'reservations:press_article_index' %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:press_article_index' %}">Retour à l'index</a></nav>
+{% endblock %}

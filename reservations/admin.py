@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import (
     Artist, Type, Locality, Location, Show, UserMeta,
     Representation, Review, ArtistType, ArtistTypeShow,
+    Reservation, PressArticle,
 )
 
 
@@ -16,7 +17,7 @@ class ArtistAdmin(admin.ModelAdmin):
 
 # Personnalisation pour Show
 class ShowAdmin(admin.ModelAdmin):
-    list_display = ('title', 'bookable', 'price')  # Colonnes à afficher
+    list_display = ('title', 'bookable', 'price', 'producer')  # Colonnes à afficher
     search_fields = ('title',)  # Barre de recherche
 
 
@@ -29,6 +30,8 @@ admin.site.register(Representation)
 admin.site.register(Review)
 admin.site.register(ArtistType)
 admin.site.register(ArtistTypeShow)
+admin.site.register(Reservation)
+admin.site.register(PressArticle)
 
 admin.site.index_title = "Projet Réservations"
 admin.site.index_header = "Projet Réservations"

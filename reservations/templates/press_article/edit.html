@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Modifier un article{% endblock %}
+
+{% block content %}
+    <h2>Modifier un article de presse</h2>
+
+    <form action="{% url 'reservations:press_article_edit' article.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="PUT">
+        <table>{{ form.as_table }}</table>
+        <button>Modifier</button>
+        <a href="{% url 'reservations:show_press_article' article.id %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:press_article_index' %}">Retour à l'index</a></nav>
+{% endblock %}

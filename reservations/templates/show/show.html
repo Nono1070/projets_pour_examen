@@ -37,6 +37,17 @@
     {% endfor %}
     </ul>
 
+    <h3>Critiques de presse</h3>
+    <ul>
+    {% for article in show.press_articles.all %}
+        {% if article.published %}
+        <li><a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }} — {{ article.critic.username }}</a></li>
+        {% endif %}
+    {% empty %}
+        <li>Aucun article de presse pour le moment.</li>
+    {% endfor %}
+    </ul>
+
     <div><a href="{% url 'reservations:show_edit' show.id %}">Modifier</a></div>
 
     <form method="post" action="{% url 'reservations:show_delete' show.id %}"

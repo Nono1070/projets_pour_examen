@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Espace producteur{% endblock %}
+
+{% block content %}
+    <h2>Espace producteur</h2>
+
+    <h3>Mes spectacles</h3>
+    {% if shows_stats %}
+    <table>
+        <thead>
+            <tr><th>Spectacle</th><th>Places réservées</th><th>Recette</th></tr>
+        </thead>
+        <tbody>
+        {% for entry in shows_stats %}
+            <tr>
+                <td><a href="{% url 'reservations:show_show' entry.show.id %}">{{ entry.show.title }}</a></td>
+                <td>{{ entry.total_quantity }}</td>
+                <td>{{ entry.total_revenue }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun spectacle ne vous est attribué comme producteur.</p>
+    {% endif %}
+
+    <h3>Critiques en attente de modération</h3>
+    {% if pending_reviews %}
+    <table>
+        <tr><th>Membre</th><th>Spectacle</th><th>Note</th><th>Critique</th><th>Action</th></tr>
+        {% for review in pending_reviews %}
+        <tr>
+            <td>{{ review.user.username }}</td>
+            <td>{{ review.show.title }}</td>
+            <td>{{ review.stars }}</td>
+            <td>{{ review.review }}</td>
+            <td>
+                <form method="post" action="{% url 'reservations:review_validate' review.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Valider</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucune critique en attente.</p>
+    {% endif %}
+
+    <h3>Articles de presse en attente de publication</h3>
+    {% if pending_articles %}
+    <table>
+        <tr><th>Critique</th><th>Spectacle</th><th>Titre</th><th>Action</th></tr>
+        {% for article in pending_articles %}
+        <tr>
+            <td>{{ article.critic.username }}</td>
+            <td>{{ article.show.title }}</td>
+            <td><a href="{% url 'reservations:show_press_article' article.id %}">{{ article.title }}</a></td>
+            <td>
+                <form method="post" action="{% url 'reservations:press_article_publish' article.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Publier</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucun article en attente.</p>
+    {% endif %}
+{% endblock %}

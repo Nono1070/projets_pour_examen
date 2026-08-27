@@ -61,6 +61,15 @@ urlpatterns = [
     path('reservation/delete/<int:id>/', views.reservation_delete, name='reservation_delete'),
     path('reservation/<int:id>/', views.show_reservation, name='show_reservation'),
 
+    path('critiques-presse/', views.press_article_index, name='press_article_index'),
+    path('critique-presse/create/', views.press_article_create, name='press_article_create'),
+    path('critique-presse/edit/<int:id>/', views.press_article_edit, name='press_article_edit'),
+    path('critique-presse/delete/<int:id>/', views.press_article_delete, name='press_article_delete'),
+    path('critique-presse/publier/<int:id>/', views.press_article_publish, name='press_article_publish'),
+    path('critique-presse/<int:id>/', views.show_press_article, name='show_press_article'),
+
+    path('producteur/', views.producer_dashboard, name='producer_dashboard'),
+
     path('api/artists/', ArtistListCreateView.as_view(), name='artist-api-list'),
     path('api/artists/<int:pk>/', ArtistRetrieveUpdateDestroyView.as_view(), name='artist-api-detail'),
 ]
