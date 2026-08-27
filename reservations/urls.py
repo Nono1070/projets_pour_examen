@@ -52,4 +52,10 @@ urlpatterns = [
     path('critique/delete/<int:id>/', views.review_delete, name='review_delete'),
     path('critique/valider/<int:id>/', views.review_validate, name='review_validate'),
     path('critique/<int:id>/', views.show_review, name='show_review'),
+
+    path('reservations/', views.reservation_index, name='reservation_index'),
+    path('reservation/create/', views.reservation_create, name='reservation_create'),
+    path('reservation/edit/<int:id>/', views.reservation_edit, name='reservation_edit'),
+    path('reservation/delete/<int:id>/', views.reservation_delete, name='reservation_delete'),
+    path('reservation/<int:id>/', views.show_reservation, name='show_reservation'),
 ]

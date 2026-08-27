@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Fiche d'une réservation{% endblock %}
+
+{% block content %}
+    <h2>{{ reservation.representation.show.title }}</h2>
+    <p>Date : {{ reservation.representation.schedule }}</p>
+    <p>Quantité : {{ reservation.quantity }}</p>
+    <p>Prix unitaire : {{ reservation.price }}</p>
+    <p>Total : {{ reservation.price|floatformat:2 }} x {{ reservation.quantity }}</p>
+
+    <div><a href="{% url 'reservations:reservation_edit' reservation.id %}">Modifier</a></div>
+
+    <form method="post" action="{% url 'reservations:reservation_delete' reservation.id %}"
+        onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="DELETE">
+        <button>Annuler la réservation</button>
+    </form>
+
+    <nav><a href="{% url 'reservations:reservation_index' %}">Retour à l'index</a></nav>
+{% endblock %}

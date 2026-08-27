@@ -1,0 +1,29 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Mes réservations{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        <li><a href="{% url 'reservations:reservation_create' %}">Réserver</a></li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr><th>Spectacle</th><th>Date</th><th>Quantité</th><th>Prix</th></tr>
+        </thead>
+        <tbody>
+        {% for reservation in reservations %}
+            <tr>
+                <td><a href="{% url 'reservations:show_reservation' reservation.id %}">{{ reservation.representation.show.title }}</a></td>
+                <td>{{ reservation.representation.schedule }}</td>
+                <td>{{ reservation.quantity }}</td>
+                <td>{{ reservation.price }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">Aucune réservation pour l'instant.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

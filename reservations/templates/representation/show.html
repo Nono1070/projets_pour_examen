@@ -14,6 +14,10 @@
         {% endif %}
     </p>
 
+    {% if request.user.is_authenticated %}
+    <div><a href="{% url 'reservations:reservation_create' %}">Réserver</a></div>
+    {% endif %}
+
     <div><a href="{% url 'reservations:representation_edit' representation.id %}">Modifier</a></div>
 
     <form method="post" action="{% url 'reservations:representation_delete' representation.id %}"

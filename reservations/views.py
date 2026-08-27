@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Artist, Type, Locality, Location, Show, Representation, Review
-from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm
+from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation
+from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm
 
 # Create your views here.
 def index(request):
@@ -618,3 +618,90 @@ def review_validate(request, id):
         messages.success(request, "Critique validée avec succès.")
 
     return redirect('reservations:show_review', id=review.id)
+
+
+# --- Reservation ---
+
+@login_required
+def reservation_index(request):
+    reservations = Reservation.objects.filter(user=request.user)
+
+    return render(request, 'reservation/index.html', {
+        'reservations': reservations,
+        'title': 'Mes réservations',
+    })
+
+
+@login_required
+def show_reservation(request, id):
+    reservation = get_object_or_404(Reservation, id=id, user=request.user)
+
+    return render(request, 'reservation/show.html', {
+        'reservation': reservation,
+    })
+
+
+@login_required
+def reservation_create(request):
+    form = ReservationForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            reservation = form.save(commit=False)
+            reservation.user = request.user
+            reservation.price = reservation.representation.show.price
+            reservation.save()
+            messages.success(request, "Réservation effectuée avec succès.")
+
+            return redirect('reservations:reservation_index')
+        else:
+            messages.error(request, "Échec de la réservation !")
+
+    return render(request, 'reservation/create.html', {
+        'form': form,
+    })
+
+
+@login_required
+def reservation_edit(request, id):
+    reservation = get_object_or_404(Reservation, id=id, user=request.user)
+    form = ReservationForm(request.POST or None, instance=reservation)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'PUT':
+            if form.is_valid():
+                reservation = form.save(commit=False)
+                reservation.price = reservation.representation.show.price
+                reservation.save()
+                messages.success(request, "Réservation modifiée avec succès.")
+
+                return redirect('reservations:show_reservation', id=reservation.id)
+            else:
+                messages.error(request, "Échec de la modification de la réservation !")
+
+    return render(request, 'reservation/edit.html', {
+        'form': form,
+        'reservation': reservation,
+    })
+
+
+@login_required
+def reservation_delete(request, id):
+    reservation = get_object_or_404(Reservation, id=id, user=request.user)
+
+    if request.method == 'POST':
+        method = request.POST.get('_method', '').upper()
+
+        if method == 'DELETE':
+            reservation.delete()
+            messages.success(request, "Réservation annulée avec succès.")
+
+            return redirect('reservations:reservation_index')
+        else:
+            messages.error(request, "Échec de l'annulation de la réservation !")
+
+    return render(request, 'reservation/show.html', {
+        'reservation': reservation,
+    })

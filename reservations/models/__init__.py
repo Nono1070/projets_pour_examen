@@ -5,6 +5,7 @@ from .location import *
 from .show import *
 from .representation import *
 from .review import *
+from .reservation import *
 from .artist_type import *
 from .artist_type_show import *
 from .user_meta import *
