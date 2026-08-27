@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .api_views import ArtistListCreateView, ArtistRetrieveUpdateDestroyView, ShowListView, ShowRetrieveView
+from .feeds import UpcomingRepresentationsFeed
 
 app_name = 'reservations'
 
@@ -9,6 +10,9 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('about/', views.about, name='about'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/export/', views.export_shows_csv, name='export_shows_csv'),
+    path('dashboard/import/', views.import_shows_csv, name='import_shows_csv'),
+    path('rss/representations/', UpcomingRepresentationsFeed(), name='representations_feed'),
 
     path('artistes/', views.artist_index, name='artist_index'),
     path('artiste/create/', views.artist_create, name='artist_create'),
