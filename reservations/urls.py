@@ -46,6 +46,8 @@ urlpatterns = [
     path('spectacle/create/', views.show_create, name='show_create'),
     path('spectacle/edit/<int:id>/', views.show_edit, name='show_edit'),
     path('spectacle/delete/<int:id>/', views.show_delete, name='show_delete'),
+    path('spectacle/proposer/', views.show_propose, name='show_propose'),
+    path('spectacle/publier/<int:id>/', views.show_publish, name='show_publish'),
     path('spectacle/<int:id>/', views.show_show, name='show_show'),
 
     path('representations/', views.representation_index, name='representation_index'),

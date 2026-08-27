@@ -10,7 +10,7 @@
         <tr><th>Types</th><td>{{ counts.types }}</td></tr>
         <tr><th>Localités</th><td>{{ counts.localities }}</td></tr>
         <tr><th>Lieux</th><td>{{ counts.locations }}</td></tr>
-        <tr><th>Spectacles</th><td>{{ counts.shows }}</td></tr>
+        <tr><th>Spectacles</th><td>{{ counts.shows }} ({{ counts.shows_pending }} en attente de publication)</td></tr>
         <tr><th>Représentations</th><td>{{ counts.representations }}</td></tr>
         <tr><th>Réservations</th><td>{{ counts.reservations }}</td></tr>
         <tr><th>Critiques</th><td>{{ counts.reviews }} ({{ counts.reviews_pending }} à modérer)</td></tr>
@@ -43,6 +43,28 @@
         <a href="{% url 'reservations:representation_index' %}">Représentations</a> |
         <a href="{% url 'reservations:review_index' %}">Critiques</a>
     </nav>
+
+    <h3>Spectacles en attente de publication</h3>
+    {% if pending_shows %}
+    <table border="1" cellspacing="0">
+        <tr><th>Titre</th><th>Producteur</th><th>Prix</th><th>Action</th></tr>
+        {% for show in pending_shows %}
+        <tr>
+            <td><a href="{% url 'reservations:show_show' show.id %}">{{ show.title }}</a></td>
+            <td>{{ show.producer.username|default:"—" }}</td>
+            <td>{{ show.price }}</td>
+            <td>
+                <form method="post" action="{% url 'reservations:show_publish' show.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Publier</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucun spectacle en attente.</p>
+    {% endif %}
 
     <h3>Critiques en attente de modération</h3>
     {% if pending_reviews %}

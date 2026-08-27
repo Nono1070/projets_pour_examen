@@ -5,7 +5,24 @@
 {% block content %}
     <h2>Espace producteur</h2>
 
-    <h3>Mes spectacles</h3>
+    <p><a href="{% url 'reservations:show_propose' %}">Proposer un spectacle</a></p>
+
+    <h3>Mes spectacles proposés, en attente de validation</h3>
+    {% if proposed_shows %}
+    <table border="1" cellspacing="0">
+        <tr><th>Titre</th><th>Prix</th></tr>
+        {% for show in proposed_shows %}
+        <tr>
+            <td><a href="{% url 'reservations:show_show' show.id %}">{{ show.title }}</a></td>
+            <td>{{ show.price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucune proposition en attente.</p>
+    {% endif %}
+
+    <h3>Mes spectacles publiés</h3>
     {% if shows_stats %}
     <table border="1" cellspacing="0">
         <thead>
@@ -22,7 +39,7 @@
         </tbody>
     </table>
     {% else %}
-    <p>Aucun spectacle ne vous est attribué comme producteur.</p>
+    <p>Aucun spectacle publié pour l'instant.</p>
     {% endif %}
 
     <h3>Critiques en attente de modération</h3>

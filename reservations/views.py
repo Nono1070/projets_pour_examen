@@ -2,7 +2,7 @@ import csv
 import io
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -11,7 +11,7 @@ from django.db.models import Sum, F
 from django.utils import timezone
 
 from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle, RoleRequest
-from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
+from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, ShowProposalForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
 from .webservice import sync_shows_from_webservice, WebserviceSyncError
 
 
@@ -46,7 +46,7 @@ def _shows_catalog_context(request):
     spectacle affiche (PID : "affichant le lieu et les prochaines dates
     de representation").
     """
-    shows = Show.objects.all()
+    shows = Show.objects.filter(published=True)
     title = 'Liste des spectacles'
 
     query = request.GET.get('q')
@@ -466,6 +466,11 @@ def show_index(request):
 def show_show(request, id):
     show = get_object_or_404(Show, id=id)
 
+    if not show.published:
+        can_preview = request.user.is_authenticated and (show.producer_id == request.user.id or is_admin(request.user))
+        if not can_preview:
+            raise Http404
+
     return render(request, 'show/show.html', {
         'show': show,
     })
@@ -533,6 +538,41 @@ def show_delete(request, id):
     return render(request, 'show/show.html', {
         'show': show,
     })
+
+
+@login_required
+@user_passes_test(is_producer)
+def show_propose(request):
+    form = ShowProposalForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            show = form.save(commit=False)
+            show.producer = request.user
+            show.published = False
+            show.save()
+            messages.success(request, "Spectacle proposé avec succès, en attente de validation par l'administrateur.")
+
+            return redirect('reservations:producer_dashboard')
+        else:
+            messages.error(request, "Échec de la proposition du spectacle !")
+
+    return render(request, 'show/propose.html', {
+        'form': form,
+    })
+
+
+@login_required
+@permission_required('reservations.change_show', raise_exception=True)
+def show_publish(request, id):
+    show = get_object_or_404(Show, id=id)
+
+    if request.method == 'POST':
+        show.published = True
+        show.save()
+        messages.success(request, "Spectacle publié avec succès.")
+
+    return redirect('reservations:show_show', id=show.id)
 
 
 # --- Representation ---
@@ -820,12 +860,14 @@ def dashboard(request):
             'localities': Locality.objects.count(),
             'locations': Location.objects.count(),
             'shows': Show.objects.count(),
+            'shows_pending': Show.objects.filter(published=False).count(),
             'representations': Representation.objects.count(),
             'reservations': Reservation.objects.count(),
             'reviews': Review.objects.count(),
             'reviews_pending': Review.objects.filter(validated=False).count(),
             'members': User.objects.count(),
         },
+        'pending_shows': Show.objects.filter(published=False).order_by('-created_at'),
         'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
         'pending_press_articles': PressArticle.objects.filter(published=False).order_by('-created_at')[:10],
         'pending_role_requests': RoleRequest.objects.filter(status=RoleRequest.Status.PENDING),
@@ -1016,7 +1058,7 @@ def press_article_publish(request, id):
 @login_required
 @user_passes_test(is_producer)
 def producer_dashboard(request):
-    shows = Show.objects.filter(producer=request.user)
+    shows = Show.objects.filter(producer=request.user, published=True)
 
     shows_stats = []
     for show in shows:
@@ -1032,6 +1074,7 @@ def producer_dashboard(request):
 
     return render(request, 'producer_dashboard.html', {
         'shows_stats': shows_stats,
+        'proposed_shows': Show.objects.filter(producer=request.user, published=False),
         'pending_reviews': Review.objects.filter(show__producer=request.user, validated=False),
         'pending_articles': PressArticle.objects.filter(show__producer=request.user, published=False),
     })

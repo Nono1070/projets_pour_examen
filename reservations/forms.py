@@ -62,6 +62,25 @@ class ShowForm(forms.ModelForm):
         ]
 
 
+class ShowProposalForm(forms.ModelForm):
+    """Utilise par un producteur pour proposer un nouveau spectacle. Pas de champ
+    producer (auto-assigne au producteur connecte) ni published (reste False
+    jusqu'a validation par un admin)."""
+
+    class Meta:
+        model = Show
+        fields = [
+            'slug',
+            'title',
+            'description',
+            'poster_url',
+            'duration',
+            'location',
+            'bookable',
+            'price',
+        ]
+
+
 class RepresentationForm(forms.ModelForm):
 
     class Meta:

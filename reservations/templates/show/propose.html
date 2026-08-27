@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Proposer un spectacle{% endblock %}
+
+{% block content %}
+    <h2>Proposer un spectacle</h2>
+    <p>Votre proposition sera visible dans le catalogue public une fois validée par un administrateur.</p>
+
+    <form action="{% url 'reservations:show_propose' %}" method="post">
+        {% csrf_token %}
+        <table border="1" cellspacing="0">{{ form.as_table }}</table>
+        <button>Proposer</button>
+        <a href="{% url 'reservations:producer_dashboard' %}">Annuler</a>
+    </form>
+
+    <nav><a href="{% url 'reservations:producer_dashboard' %}">Retour à l'espace producteur</a></nav>
+{% endblock %}
