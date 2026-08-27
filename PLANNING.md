@@ -144,6 +144,11 @@ Implémenté :
 - Tableau de bord admin étendu pour compenser la perte d'accès à l'espace producteur : sections « Spectacles en attente de publication » et « Articles de presse en attente » (vue globale, non scoping producteur), en plus de « Critiques en attente » déjà présent.
 - Décision confirmée : l'ADMIN garde `add_pressarticle` (aucun changement, cohérent avec le principe « ADMIN peut tout faire » déjà établi dans ce projet).
 
+## Rôles CRITIC/PRODUCER mutuellement exclusifs + critique réservée aux spectacles réservés (28/08/2026)
+- **CRITIC et PRODUCER incompatibles** (décision explicite) : `role_request_create` refuse la demande si l'utilisateur a déjà l'autre rôle ; `role_request_approve` refait la même vérification au moment d'approuver (garde défensive si l'autre rôle a été accordé entre-temps, ex. via Django Admin) ; page profil masque le lien « Devenir X » avec un message explicite si incompatible.
+- **Bug métier corrigé** : le PID est explicite (« le membre pourra ... commenter les spectacles auxquels il a assisté ») mais rien ne vérifiait qu'un membre avait réservé une place avant de pouvoir critiquer un spectacle. `ReviewForm` accepte désormais un kwarg `user` qui restreint le champ `show` aux spectacles effectivement réservés (`Show.objects.filter(representations__reservations__user=user)`) — ce filtrage du queryset sert aussi de validation serveur (Django rejette toute valeur hors queryset). `review_create`/`review_edit` passent ce `user`. Message clair si l'utilisateur n'a aucune réservation.
+- **Nav publique** : retrait du lien « Critiques » (redondant avec les critiques déjà affichées sur chaque fiche spectacle, et sa création dépend maintenant d'avoir réservé). Garde uniquement « Critiques presse ». Lien « Laisser une critique sur un spectacle réservé » ajouté sur « Mes réservations » pour la découvrabilité.
+
 ## Prochaines étapes possibles
 - Reprendre **chaque** fonctionnalité de ce document avec l'utilisateur en mode théorie-avant-code : rien de ce qui est coché [x] n'a été expliqué ligne par ligne, tout a été écrit en session accélérée à la demande explicite de l'utilisateur.
 - Utiliser le contenu de `docs/example d examen/` pour s'entraîner sur de vrais énoncés d'examen une fois le socle ci-dessus maîtrisé en autonomie.
