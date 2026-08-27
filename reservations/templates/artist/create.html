@@ -8,7 +8,7 @@
     <form action="{% url 'reservations:artist_create' %}" method="post">
         {% csrf_token %}
 
-        {{ form }}
+        <table>{{ form.as_table }}</table>
 
         <button>Ajouter</button>
         <a href="{% url 'reservations:artist_index' %}">Annuler</a>

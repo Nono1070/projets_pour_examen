@@ -8,7 +8,7 @@
     <form action="{% url 'reservations:type_edit' type.id %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="_method" value="PUT">
-        {{ form }}
+        <table>{{ form.as_table }}</table>
         <button>Modifier</button>
         <a href="{% url 'reservations:show_type' type.id %}">Annuler</a>
     </form>

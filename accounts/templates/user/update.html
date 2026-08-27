@@ -6,7 +6,7 @@
     <h2>Modifier mon profil</h2>
     <form method="post" action="{% url 'accounts:user-update' user.id %}">
         {% csrf_token %}
-        {{ form }}
+        <table>{{ form.as_table }}</table>
         <button type="submit">Modifier</button>
     </form>
 {% endblock %}

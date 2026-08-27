@@ -7,7 +7,7 @@
 
     <form action="{% url 'reservations:location_create' %}" method="post">
         {% csrf_token %}
-        {{ form }}
+        <table>{{ form.as_table }}</table>
         <button>Ajouter</button>
         <a href="{% url 'reservations:location_index' %}">Annuler</a>
     </form>
