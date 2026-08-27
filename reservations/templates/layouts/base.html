@@ -5,9 +5,36 @@
 <title>Projet réservations - {% block title %}Bienvenue{% endblock %}</title>
 </head>
 <body>
-<div class="container">
-    <header>
-        <div style="float:right">
+<table border="1" cellpadding="8" width="100%">
+    <tr>
+        <td colspan="2">
+            <nav>
+                <a href="{% url 'reservations:index' %}">Accueil</a> |
+                <a href="{% url 'reservations:show_index' %}">Spectacles</a> |
+                <a href="{% url 'reservations:artist_index' %}">Artistes</a> |
+                <a href="{% url 'reservations:review_index' %}">Critiques</a> |
+                <a href="{% url 'reservations:press_article_index' %}">Critiques presse</a> |
+                <a href="{% url 'reservations:contact' %}">Contact</a> |
+                <a href="{% url 'reservations:about' %}">À propos</a>
+            </nav>
+        </td>
+    </tr>
+    <tr valign="top">
+        <td>
+            <div id="notification">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </td>
+        <td width="200">
+            <h3>Mon compte</h3>
             {% if request.user.is_authenticated %}
             <p>Bonjour {{ request.user.username }} !</p>
             <p><a href="{% url 'accounts:user-profile' %}">Mon profil</a></p>
@@ -31,43 +58,13 @@
             <p><a href="{% url 'login' %}">Se connecter</a></p>
             <p><a href="{% url 'accounts:user-signup' %}">S'inscrire</a></p>
             {% endif %}
-        </div>
-
-        <nav>
-            <a href="{% url 'reservations:index' %}">Accueil</a> |
-            <a href="{% url 'reservations:show_index' %}">Spectacles</a> |
-            <a href="{% url 'reservations:artist_index' %}">Artistes</a> |
-            <a href="{% url 'reservations:review_index' %}">Critiques</a> |
-            <a href="{% url 'reservations:press_article_index' %}">Critiques presse</a> |
-            <a href="{% url 'reservations:contact' %}">Contact</a> |
-            <a href="{% url 'reservations:about' %}">À propos</a>
-        </nav>
-    </header>
-    <main>
-        <div id="notification">
-            {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
-
-        {% block content %}{% endblock %}
-    </main>
-    <footer>&copy; Projet Réservations | <a href="{% url 'reservations:representations_feed' %}">Flux RSS des représentations</a></footer>
-
-    {% if not request.COOKIES.cookie_consent %}
-    <div id="cookie-banner">
-        <p>Ce site utilise des cookies nécessaires à son fonctionnement (session, préférences).</p>
-        <form method="post" action="{% url 'reservations:accept_cookies' %}">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.path }}">
-            <button type="submit">Accepter</button>
-        </form>
-    </div>
-    {% endif %}
-</div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            {% include 'layouts/footer.html' %}
+        </td>
+    </tr>
+</table>
 </body>
 </html>
