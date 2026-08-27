@@ -93,6 +93,17 @@ class RepresentationForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
+    """Le membre ne peut critiquer que les spectacles pour lesquels il a
+    reserve une place (PID : "commenter les spectacles auxquels il a
+    assiste") - le champ show n'affiche que ces spectacles-la."""
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user is not None:
+            self.fields['show'].queryset = Show.objects.filter(
+                representations__reservations__user=user
+            ).distinct()
 
     class Meta:
         model = Review

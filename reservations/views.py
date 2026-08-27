@@ -683,7 +683,11 @@ def show_review(request, id):
 
 @login_required
 def review_create(request):
-    form = ReviewForm(request.POST or None)
+    if not Reservation.objects.filter(user=request.user).exists():
+        messages.error(request, "Vous devez avoir réservé une place pour un spectacle avant de pouvoir le critiquer.")
+        return redirect('reservations:reservation_index')
+
+    form = ReviewForm(request.POST or None, user=request.user)
 
     if request.method == 'POST':
         if form.is_valid():
@@ -705,7 +709,7 @@ def review_create(request):
 @login_required
 def review_edit(request, id):
     review = get_object_or_404(Review, id=id, user=request.user)
-    form = ReviewForm(request.POST or None, instance=review)
+    form = ReviewForm(request.POST or None, instance=review, user=request.user)
 
     if request.method == 'POST':
         method = request.POST.get('_method', '').upper()

@@ -7,6 +7,9 @@
 
     <ul>
         <li><a href="{% url 'reservations:reservation_create' %}">Réserver</a></li>
+        {% if reservations %}
+        <li><a href="{% url 'reservations:review_create' %}">Laisser une critique sur un spectacle réservé</a></li>
+        {% endif %}
     </ul>
 
     <table border="1" cellspacing="0">
