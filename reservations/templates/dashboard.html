@@ -5,7 +5,7 @@
 {% block content %}
     <h2>Tableau de bord</h2>
 
-    <table>
+    <table border="1" cellspacing="0">
         <tr><th>Artistes</th><td>{{ counts.artists }}</td></tr>
         <tr><th>Types</th><td>{{ counts.types }}</td></tr>
         <tr><th>Localités</th><td>{{ counts.localities }}</td></tr>
@@ -46,7 +46,7 @@
 
     <h3>Critiques en attente de modération</h3>
     {% if pending_reviews %}
-    <table>
+    <table border="1" cellspacing="0">
         <tr>
             <th>Membre</th>
             <th>Spectacle</th>

@@ -6,7 +6,7 @@
     <h2>Inscription</h2>
     <form method="post" action="{% url 'accounts:user-signup' %}">
         {% csrf_token %}
-        <table>{{ form.as_table }}</table>
+        <table border="1" cellspacing="0">{{ form.as_table }}</table>
         <button type="submit">S'inscrire</button>
     </form>
 {% endblock %}
