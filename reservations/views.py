@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -8,13 +7,13 @@ from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, R
 
 # Create your views here.
 def index(request):
-    return HttpResponse("<a href='/'>Accueil</a> | <a href='/contact/'>Contact</a>| <a href='/about/'>À propos</a> <br><h1>Accueil</h1><p>Bienvenue sur notre site.</p>.")
+    return render(request, 'index.html')
 
 def contact(request):
-    return HttpResponse("<a href='/'>Accueil</a> | <a href='/contact/'>Contact</a>| <a href='/about/'>À propos</a> <br><h1>Contact</h1><p>Nous contacter.</p>.")
+    return render(request, 'contact.html')
 
 def about(request):
-    return HttpResponse("<a href='/'>Accueil</a> | <a href='/contact/'>Contact</a>| <a href='/about/'>À propos</a> <br><h1>À propos</h1><p>Informations sur notre entreprise.</p>.")
+    return render(request, 'about.html')
 
 
 def artist_index(request):
