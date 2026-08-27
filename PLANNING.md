@@ -104,19 +104,32 @@ Environnement d'exécution : `..\python-3.12.0-embed-amd64\python.exe manage.py 
 ## Dashboard admin (27/08/2026)
 - [x] Nouvelle page `reservations:dashboard` (`/dashboard/`), réservée aux membres du groupe ADMIN ou superuser (`user_passes_test(is_admin)`, `is_admin` défini dans `reservations/views.py`) : compteurs de tout le catalogue (artistes, types, localités, lieux, spectacles, représentations, réservations, critiques dont en attente, membres), liens rapides vers la gestion de chaque contenu, et liste des critiques en attente de modération avec bouton « Valider » direct (réutilise `review_validate`).
 - Lien « Tableau de bord » ajouté dans la nav (`layouts/base.html`), visible via `perms.reservations.add_show` (permission que seul le groupe ADMIN possède, MEMBER n'a que des `view_*`) ou `is_superuser` — même logique que le lien Administration existant vers `/admin/`.
-- **Écart volontaire par rapport au cahier des charges (PID)** : le PID décrit un back-office bien plus large (CRUD via un progiciel tiers, import/export CSV, mise à jour via un web service tiers, statistiques de vente par producteur, rôles critique de presse/producteur, API affiliés à paliers Free/Starter/Premium, flux RSS, bandeau cookies...). Seuls le dashboard et la clarté des formulaires ont été demandés explicitement pour cette session ; le reste du PID reste hors scope (voir « Ce qui reste »).
 
-## Ce qui reste
-- CRUD `ArtistType`/`ArtistTypeShow` uniquement via Django Admin pour l'instant (pas de vues frontend dédiées — cohérent avec le roadmap, qui ne le demande pas non plus).
-- Fixtures/données de test et clés naturelles (`natural_key`, `get_by_natural_key`) : volontairement non implémentées (sert uniquement à l'export/import JSON des données de test, pas à l'app elle-même).
-- Modèle `Price` séparé : volontairement non implémenté (voir écart documenté ci-dessus).
-- Authentification API par JWT, tests automatisés DRF, documentation Swagger : volontairement non implémentés (voir chapitre 8 ci-dessus, tous marqués optionnels/TODO dans le roadmap lui-même).
-- Fonctionnalités du PID hors scope pour l'instant (volontairement, à discuter si demandées explicitement) : flux RSS, import/export CSV, intégration d'un web service tiers pour mettre à jour le catalogue, API affiliés à paliers (Free/Starter/Premium), rôle critique de presse (soumission d'articles), rôle producteur (statistiques de vente, modération dédiée), pagination/tri/filtres avancés sur les listes du catalogue (au-delà de la recherche par nom déjà en place sur Artist), bandeau de consentement cookies.
+## Balayage complet du cahier des charges (PID) (27/08/2026)
+À la demande explicite de l'utilisateur ("tout"), quasiment toutes les fonctionnalités fonctionnelles du PID encore manquantes ont été implémentées en une série de commits, chacun documenté en détail dans son message de commit (`git log`) :
+- **Rôle producteur** : `Show.producer` (FK User), groupe `PRODUCER`, espace `/producteur/` (statistiques de vente par spectacle — places réservées, recette —, modération des critiques et articles de presse limitée aux spectacles produits par l'utilisateur connecté).
+- **Rôle critique de presse** : modèle `PressArticle`, groupe `CRITIC`, CRUD (soumission, modification avant publication, suppression), publication réservée au producteur du spectacle concerné ou à un admin. Articles publiés affichés sur la fiche spectacle.
+- **API affiliés à paliers** : `UserMeta.affiliate_tier` (none/free/starter/premium), `AffiliateTierThrottle` (`reservations/throttling.py`) limite les requêtes/jour selon le palier (Free 20/j, Starter 200/j, Premium 2000/j). API Show en lecture seule ajoutée en plus d'Artist. Le palier se configure via Django Admin (pas de flux d'upgrade dédié).
+- **Flux RSS** : `/rss/representations/`, les 20 prochaines représentations, via `django.contrib.syndication` (le « progiciel » demandé par l'itération 7).
+- **Export/import CSV** du catalogue de spectacles depuis le dashboard admin.
+- **Intégration web service tiers** : `reservations/webservice.py` + commande `sync_shows_from_webservice` + bouton dashboard. Structure prête et testée (gestion d'erreurs réseau/format), mais `settings.THIRD_PARTY_CATALOG_API_URL` est vide par défaut — **aucun fournisseur réel n'est branché**, le PID n'en nomme pas pour cette fonctionnalité précise (contrairement à l'itération 9, qui liste des API nécessitant chacune la création d'un compte par l'utilisateur).
+- **Catalogue des spectacles** : pagination (10/page), tri (titre/lieu/réservable/prix), filtres (lieu, réservable), recherche par titre — reprend le use case « Consulter le catalogue paginé des spectacles » du PID.
+- **Bandeau cookies** (`/cookies/accepter/`), sans JS, cohérent avec le reste du site.
+- **Règles métier inscription** : mot de passe ≥ 6 caractères + 1 majuscule + 1 caractère spécial (`accounts/validators.py`, `AUTH_PASSWORD_VALIDATORS`), email unique (`UserSignUpForm.clean_email`).
+- **Espace personnel** (page profil) : résumé des réservations/achats (nombre, places, montant total dépensé), critiques postées, articles de presse soumis, avec liens vers les listes complètes.
+
+### Décisions explicites de ne PAS implémenter (documentées, pas oubliées)
+- **Frontend JS (React/Angular/Vue/AJAX)** : le PID le recommande (itération 8) mais **contredit directement** la préférence forte et répétée de l'utilisateur pour du HTML minimal sans style ni JS (voir [[feedback-django-minimal-html]]). Ce conflit est tranché en faveur de la préférence explicite de l'utilisateur.
+- **Itération 9 (consommer une vraie API RESTful externe)** : toutes les API suggérées (London Theater, Théâtre de la ville de Paris, Agenda.Brussels...) nécessitent la création d'un compte / une clé API par l'utilisateur — impossible à faire de façon autonome sans ses identifiants.
+- **Authentification API par JWT, tests automatisés DRF, documentation Swagger** : toujours marqués optionnels/TODO dans le roadmap Django lui-même (pas le PID).
+- **Actions groupées sur le catalogue** ("sélectionner des éléments et effectuer des actions groupées") : déjà couvert par Django Admin (actions en masse natives sur tous les modèles enregistrés) — pas de réimplémentation frontend.
+- **Diagrammes (contexte, cas d'utilisation, classes participantes), business model, étude comparative** : ce sont des livrables de rapport/analyse (UML, texte), pas du code — hors du périmètre d'un agent de développement.
+- CRUD `ArtistType`/`ArtistTypeShow` en frontend dédié, fixtures/clés naturelles, modèle `Price` séparé : toujours hors scope, voir raisons documentées plus haut dans ce fichier.
 
 ## Prochaines étapes possibles
-- Reprendre **chaque** chapitre ci-dessus avec l'utilisateur en mode théorie-avant-code : décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, `login_required`/`permission_required`, le modèle pivot `ArtistType`/`ArtistTypeShow`, le modèle `Reservation`, les permissions DRF, le dashboard admin, etc. **Tout ce qui est coché [x] a été écrit par l'IA en sessions accélérées, à la demande explicite de l'utilisateur — rien n'est encore réellement appris.**
-- Utiliser le contenu de `docs/` (`PID-WPWD2022.txt`, `WPWD2023SS.txt`, etc.) pour s'entraîner sur de vrais énoncés d'examen une fois le socle ci-dessus maîtrisé en autonomie.
-- Si l'utilisateur veut aller plus loin dans le cahier des charges (PID), négocier explicitement quelle(s) fonctionnalité(s) précise(s) parmi celles listées dans « Ce qui reste » avant de les implémenter — le PID est un document générique très large (10 itérations), pas un scope validé pour ce projet.
+- Reprendre **chaque** fonctionnalité de ce document avec l'utilisateur en mode théorie-avant-code : rien de ce qui est coché [x] n'a été expliqué ligne par ligne, tout a été écrit en session accélérée à la demande explicite de l'utilisateur.
+- Utiliser le contenu de `docs/example d examen/` pour s'entraîner sur de vrais énoncés d'examen une fois le socle ci-dessus maîtrisé en autonomie.
+- Si un vrai fournisseur de web service ou d'API affiliés doit être branché, il faudra que l'utilisateur fournisse l'URL/les identifiants — `settings.THIRD_PARTY_CATALOG_API_URL` est le point d'entrée pour le premier cas.
 
 ---
 *Ce document sert de fil rouge pour la prochaine session.*
