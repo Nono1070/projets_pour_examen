@@ -21,4 +21,19 @@
             </form>
         </li>
     </ul>
+
+    <h3>Mes réservations et achats</h3>
+    <p>
+        {{ reservations_count }} réservation(s), {{ reservations_total_quantity }} place(s) au total,
+        {{ reservations_total_spent }} dépensé au total.
+    </p>
+    <p><a href="{% url 'reservations:reservation_index' %}">Voir mes réservations</a></p>
+
+    <h3>Mes critiques et articles</h3>
+    <p>{{ reviews_count }} critique(s) postée(s).</p>
+    <p>{{ press_articles_count }} article(s) de presse soumis.</p>
+    <p>
+        <a href="{% url 'reservations:review_create' %}">Poster une critique</a> |
+        <a href="{% url 'reservations:press_article_index' %}">Voir les articles de presse</a>
+    </p>
 {% endblock %}

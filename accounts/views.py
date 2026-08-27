@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from django.db.models import Sum, F
+
+from reservations.models import Reservation, Review, PressArticle, UserMeta
 
 from .forms import UserSignUpForm, UserUpdateForm
 
@@ -46,8 +49,23 @@ def profile(request):
         "nl": "Nederlands",
     }
 
+    try:
+        user_language = languages.get(request.user.usermeta.langue)
+    except UserMeta.DoesNotExist:
+        user_language = None
+
+    reservations_stats = Reservation.objects.filter(user=request.user).aggregate(
+        total_quantity=Sum('quantity'),
+        total_spent=Sum(F('quantity') * F('price')),
+    )
+
     return render(request, 'user/profile.html', {
-        "user_language": languages.get(request.user.usermeta.langue),
+        "user_language": user_language,
+        "reservations_count": Reservation.objects.filter(user=request.user).count(),
+        "reservations_total_quantity": reservations_stats['total_quantity'] or 0,
+        "reservations_total_spent": reservations_stats['total_spent'] or 0,
+        "reviews_count": Review.objects.filter(user=request.user).count(),
+        "press_articles_count": PressArticle.objects.filter(critic=request.user).count(),
     })
 
 
