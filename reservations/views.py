@@ -23,6 +23,10 @@ def is_producer(user):
     return user.groups.filter(name='PRODUCER').exists()
 
 
+# CRITIC et PRODUCER sont mutuellement exclusifs (decision explicite de l'utilisateur).
+ROLE_OTHER_ROLE = {'CRITIC': 'PRODUCER', 'PRODUCER': 'CRITIC'}
+
+
 COOKIE_CONSENT_NAME = 'cookie_consent'
 COOKIE_CONSENT_MAX_AGE = 60 * 60 * 24 * 365
 
@@ -1092,6 +1096,11 @@ def role_request_create(request, role):
         messages.error(request, "Vous avez déjà ce rôle.")
         return redirect('accounts:user-profile')
 
+    other_role = ROLE_OTHER_ROLE[role]
+    if request.user.groups.filter(name=other_role).exists():
+        messages.error(request, "Les rôles Critique de presse et Producteur sont incompatibles : vous ne pouvez pas demander l'un si vous possédez déjà l'autre.")
+        return redirect('accounts:user-profile')
+
     if RoleRequest.objects.filter(user=request.user, role=role, status=RoleRequest.Status.PENDING).exists():
         messages.error(request, "Vous avez déjà une demande en attente pour ce rôle.")
         return redirect('accounts:user-profile')
@@ -1118,6 +1127,16 @@ def role_request_approve(request, id):
     role_request = get_object_or_404(RoleRequest, id=id, status=RoleRequest.Status.PENDING)
 
     if request.method == 'POST':
+        other_role = ROLE_OTHER_ROLE[role_request.role]
+
+        if role_request.user.groups.filter(name=other_role).exists():
+            messages.error(
+                request,
+                f"Impossible d'approuver : {role_request.user.username} possède déjà le rôle "
+                f"{other_role}, incompatible avec {role_request.role}.",
+            )
+            return redirect('reservations:dashboard')
+
         group = Group.objects.get(name=role_request.role)
         group.user_set.add(role_request.user)
 
