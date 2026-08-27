@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .api_views import ArtistListCreateView, ArtistRetrieveUpdateDestroyView
 
 app_name = 'reservations'
 
@@ -58,4 +59,7 @@ urlpatterns = [
     path('reservation/edit/<int:id>/', views.reservation_edit, name='reservation_edit'),
     path('reservation/delete/<int:id>/', views.reservation_delete, name='reservation_delete'),
     path('reservation/<int:id>/', views.show_reservation, name='show_reservation'),
+
+    path('api/artists/', ArtistListCreateView.as_view(), name='artist-api-list'),
+    path('api/artists/<int:pk>/', ArtistRetrieveUpdateDestroyView.as_view(), name='artist-api-detail'),
 ]
