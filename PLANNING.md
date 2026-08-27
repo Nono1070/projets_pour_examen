@@ -73,17 +73,40 @@ Environnement d'exécution : `..\python-3.12.0-embed-amd64\python.exe manage.py 
 - [x] Templates `artist/show.html` et `type/show.html` adaptés (`artist.a_artistTypes.all` / `type.t_artistTypes.all` au lieu de `artist.types.all` / `type.artists.all`).
 - **Piège rencontré et corrigé** : `makemigrations` a généré `CreateModel(ArtistType, db_table='artist_type')` **avant** `RemoveField(artist, 'types')`, alors que l'ancienne `ManyToManyField` utilisait déjà `db_table='artist_type'` — la migration plantait avec `table "artist_type" already exists`. C'est exactement le piège que le roadmap annonce dans son intro à ce chapitre. Corrigé en réordonnant manuellement les opérations dans le fichier de migration généré (`RemoveField` + `AddConstraint` d'abord, `CreateModel` ensuite). **Bon réflexe à retenir pour l'examen** : quand `makemigrations` réutilise un nom de table déjà pris, il faut relire et réordonner le fichier de migration généré plutôt que de le lancer les yeux fermés.
 
-## Ce qui reste (non traité dans cette session)
-- **API RESTful** (`docs/Roadmap-Django5_API.txt`) — Django REST Framework, authentification par token, endpoints. Gros morceau à part entière, pas commencé.
-- Récupération/modification de mot de passe (voir Chapitre 4 ci-dessus).
+## Exercice "à vous de jouer" — Reservation (Validé le 27/08/2026)
+- [x] Modèle `Reservation` (`user` FK RESTRICT, `representation` FK RESTRICT, `quantity`, `price`, `created_at`) avec CRUD complet (`reservations/`, `reservation/create/`, `edit/`, `delete/`, `<id>/`), réservé aux utilisateurs connectés, chacun ne voit/modifie que ses propres réservations (même patron que `Review` : `get_object_or_404(Reservation, id=id, user=request.user)`).
+- [x] `price` copié depuis `representation.show.price` au moment de la réservation (photo du prix, insensible à un changement ultérieur du prix du spectacle).
+- **Écart volontaire par rapport au roadmap** : pas de modèle `Price` séparé ni de relation ManyToMany `Show↔Price`. `Show` a déjà un champ `price` simple, ajouté lors d'une session précédente ; dupliquer la notion avec un modèle Price contredirait la consigne de simplicité de l'utilisateur. `Reservation↔Representation` est implémenté en deux relations ManyToOne (vers `User` et `Representation`), exactement l'alternative que le roadmap propose lui-même à la relation ManyToMany avec table pivot enrichie.
+- Lien "Mes réservations" dans la nav (visible si connecté), lien "Réserver" sur la fiche représentation.
+
+## Chapitre 8 (API) — API RESTful avec Django REST Framework (Validé le 27/08/2026)
+- [x] DRF déjà installé dans l'environnement (3.15.2, aucune installation nécessaire). Ajouté à `INSTALLED_APPS`.
+- [x] API limitée au modèle `Artist` (comme le roadmap le fait lui-même) : `GET/POST /api/artists/`, `GET/PUT/DELETE /api/artists/<id>/`.
+- [x] `ArtistSerializer` avec champ `links` (HATEOAS, `self` + `all_artists`), comme le roadmap le demande.
+- [x] Authentification Session + Basic (`REST_FRAMEWORK` dans `settings.py`). Permission `DjangoModelPermissionsOrAnonReadOnly` : lecture publique (cohérent avec le reste du site), écriture soumise aux permissions Django existantes (groupes ADMIN/MEMBER déjà créés au chapitre 4) — aucun système de permission séparé à maintenir.
+- Testé avec `curl -u admin:... / -u bob:...` : lecture publique OK, écriture anonyme 403, écriture par `bob` (MEMBER, pas de `add_artist`) 403, écriture par `admin` 201/204.
+- **Non fait, volontairement** : authentification JWT (`§8.4` du roadmap, explicitement "optionnel", nécessite une dépendance `djangorestframework-simplejwt` non installée), tests automatisés DRF (`§11`, "optionnel"), documentation Swagger (`§13`, marqué TODO dans le roadmap lui-même), API pour les autres modèles (hors du scope du roadmap, qui ne couvre qu'Artist).
+
+## Chapitre 4 (suite) — Mot de passe oublié / changement (Validé le 27/08/2026)
+- [x] Les routes existaient déjà (`django.contrib.auth.urls` inclus dans `projet_reservation/urls.py`) et `EMAIL_BACKEND` était déjà en mode console — il ne manquait que les 7 templates (`accounts/templates/registration/password_reset_*.html`, `password_change_*.html`), écrits dans le même style minimal que `login.html`.
+- **Piège rencontré et corrigé** : `django.contrib.admin` embarque ses propres templates `registration/password_reset_*.html` (stylés en CSS admin). Comme il était listé avant `reservations`/`accounts` dans `INSTALLED_APPS`, le chargeur de templates (`APP_DIRS`, qui cherche dans l'ordre des apps installées) trouvait la version admin avant la nôtre. Corrigé en plaçant `reservations` et `accounts` en tête de `INSTALLED_APPS`. À retenir : quand un template `registration/*` semble "ignorer" nos modifications, vérifier l'ordre de `INSTALLED_APPS` avant de chercher ailleurs.
+- Testé de bout en bout : demande de réinitialisation → email affiché dans le terminal (backend console) → lien de réinitialisation fonctionnel → nouveau mot de passe pris en compte.
+
+## Nettoyage et données de test (27/08/2026)
+- [x] Suppression du fichier vestige `reservations/models.py` (coexistait avec le package `reservations/models/`, jamais utilisé).
+- [x] Identifiants de test créés (mot de passe de `admin` réinitialisé, utilisateur `bob` créé dans le groupe MEMBER) — voir `CREDENTIALS.txt` à la racine (non commité, dans `.gitignore`).
+- [x] Données de démonstration ajoutées (1 localité, 1 lieu, 2 spectacles avec prix, 2 représentations) pour pouvoir tester réellement l'application (la base ne contenait avant que les artistes/types).
+- [x] **Bug corrigé** : les vues `index`, `contact` et `about` (`reservations/views.py`) étaient encore de vieux vestiges du chapitre 1 (routage niveau 1) — un `HttpResponse` codé en dur, sans passer par `layouts/base.html`. Conséquence : le menu de connexion/navigation n'apparaissait pas sur ces 3 pages, contrairement à toutes les autres. Corrigé en les convertissant en `render()` avec des templates minimalistes (`templates/index.html`, `contact.html`, `about.html`, chacun `extends 'layouts/base.html'`).
+
+## Ce qui reste
 - CRUD `ArtistType`/`ArtistTypeShow` uniquement via Django Admin pour l'instant (pas de vues frontend dédiées — cohérent avec le roadmap, qui ne le demande pas non plus).
-- Nettoyer le fichier `reservations/models.py` (vestige vide du `startapp`, coexistant avec le package `reservations/models/`).
-- Fixtures/données de test et clés naturelles (`natural_key`, `get_by_natural_key`) : volontairement non implémentées dans cette session (sert uniquement à l'export/import JSON des données de test, pas à l'app elle-même).
+- Fixtures/données de test et clés naturelles (`natural_key`, `get_by_natural_key`) : volontairement non implémentées (sert uniquement à l'export/import JSON des données de test, pas à l'app elle-même).
+- Modèle `Price` séparé : volontairement non implémenté (voir écart documenté ci-dessus).
+- Authentification API par JWT, tests automatisés DRF, documentation Swagger : volontairement non implémentés (voir chapitre 8 ci-dessus, tous marqués optionnels/TODO dans le roadmap lui-même).
 
 ## Prochaines étapes possibles
-- Reprendre **chaque** chapitre ci-dessus avec l'utilisateur en mode théorie-avant-code : décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, `login_required`/`permission_required`, le modèle pivot `ArtistType`/`ArtistTypeShow`, etc. **Tout ce qui est coché [x] a été écrit par l'IA en une seule session accélérée, à la demande explicite de l'utilisateur — rien n'est encore réellement appris.**
+- Reprendre **chaque** chapitre ci-dessus avec l'utilisateur en mode théorie-avant-code : décortiquer `ArtistForm`, le pattern `_method`, `request.GET`, `login_required`/`permission_required`, le modèle pivot `ArtistType`/`ArtistTypeShow`, le modèle `Reservation`, les permissions DRF, etc. **Tout ce qui est coché [x] a été écrit par l'IA en sessions accélérées, à la demande explicite de l'utilisateur — rien n'est encore réellement appris.**
 - Utiliser le contenu de `docs/` (`PID-WPWD2022.txt`, `WPWD2023SS.txt`, etc.) pour s'entraîner sur de vrais énoncés d'examen une fois le socle ci-dessus maîtrisé en autonomie.
-- Décider si l'API RESTful (chapitre suivant) doit être implémentée aussi.
 
 ---
 *Ce document sert de fil rouge pour la prochaine session.*
