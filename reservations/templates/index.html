@@ -4,32 +4,63 @@
 
 {% block content %}
     <h1>Accueil</h1>
-    <p>Bienvenue sur notre site. Découvrez notre catalogue de spectacles ci-dessous.</p>
+    <p>Bienvenue sur notre site. Recherchez, triez et filtrez notre catalogue de spectacles ci-dessous.</p>
 
-    <h2>Catalogue des spectacles</h2>
+    <h2>{{ title }}</h2>
+
+    <form method="get" action="{% url 'reservations:index' %}">
+        <input type="text" name="q" value="{{ query }}" placeholder="Rechercher par titre...">
+
+        <select name="location">
+            <option value="">Tous les lieux</option>
+            {% for location in locations %}
+            <option value="{{ location.id }}" {% if selected_location == location.id|stringformat:"s" %}selected{% endif %}>{{ location.designation }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="bookable">
+            <option value="">Réservable ou non</option>
+            <option value="1" {% if selected_bookable == "1" %}selected{% endif %}>Réservable</option>
+            <option value="0" {% if selected_bookable == "0" %}selected{% endif %}>Non réservable</option>
+        </select>
+
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <button type="submit">Rechercher</button>
+    </form>
+
+    <p>
+        Trier par :
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=title">Titre</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=location">Lieu</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=bookable">Réservable</a> |
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort=price">Prix</a>
+    </p>
 
     <table>
         <thead>
-            <tr><th>Titre</th><th>Lieu</th><th>Prochaine représentation</th></tr>
+            <tr><th>Titre</th><th>Lieu</th><th>Prix</th><th>Prochaine représentation</th></tr>
         </thead>
         <tbody>
         {% for entry in shows_with_next %}
             <tr>
                 <td><a href="{% url 'reservations:show_show' entry.show.id %}">{{ entry.show.title }}</a></td>
                 <td>{{ entry.show.location.designation|default:"—" }}</td>
-                <td>
-                    {% if entry.next_representation %}
-                        {{ entry.next_representation.schedule }}
-                    {% else %}
-                        Aucune représentation programmée
-                    {% endif %}
-                </td>
+                <td>{{ entry.show.price }}</td>
+                <td>{{ entry.next_representation.schedule|default:"—" }}</td>
             </tr>
         {% empty %}
-            <tr><td colspan="3">Aucun spectacle dans la base de données.</td></tr>
+            <tr><td colspan="4">Aucun spectacle dans la base de données.</td></tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <p><a href="{% url 'reservations:show_index' %}">Voir tout le catalogue (recherche, tri, filtres)</a></p>
+    <p>
+        {% if shows.has_previous %}
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort={{ sort }}&page={{ shows.previous_page_number }}">Précédent</a>
+        {% endif %}
+        Page {{ shows.number }} / {{ shows.paginator.num_pages }}
+        {% if shows.has_next %}
+        <a href="?q={{ query }}&location={{ selected_location }}&bookable={{ selected_bookable }}&sort={{ sort }}&page={{ shows.next_page_number }}">Suivant</a>
+        {% endif %}
+    </p>
 {% endblock %}

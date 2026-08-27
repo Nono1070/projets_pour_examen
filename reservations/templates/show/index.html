@@ -39,17 +39,18 @@
 
     <table>
         <thead>
-            <tr><th>Titre</th><th>Lieu</th><th>Prix</th></tr>
+            <tr><th>Titre</th><th>Lieu</th><th>Prix</th><th>Prochaine représentation</th></tr>
         </thead>
         <tbody>
-        {% for show in shows %}
+        {% for entry in shows_with_next %}
             <tr>
-                <td><a href="{% url 'reservations:show_show' show.id %}">{{ show.title }}</a></td>
-                <td>{{ show.location.designation|default:"—" }}</td>
-                <td>{{ show.price }}</td>
+                <td><a href="{% url 'reservations:show_show' entry.show.id %}">{{ entry.show.title }}</a></td>
+                <td>{{ entry.show.location.designation|default:"—" }}</td>
+                <td>{{ entry.show.price }}</td>
+                <td>{{ entry.next_representation.schedule|default:"—" }}</td>
             </tr>
         {% empty %}
-            <tr><td colspan="3">Aucun spectacle dans la base de données.</td></tr>
+            <tr><td colspan="4">Aucun spectacle dans la base de données.</td></tr>
         {% endfor %}
         </tbody>
     </table>

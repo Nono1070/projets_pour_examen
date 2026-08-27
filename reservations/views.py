@@ -34,20 +34,66 @@ def accept_cookies(request):
     return redirect('reservations:index')
 
 
-# Create your views here.
-def index(request):
-    shows = Show.objects.all().order_by('title')
+def _shows_catalog_context(request):
+    """
+    Contexte partage par la page d'accueil et le catalogue des spectacles
+    (/spectacles/) : recherche par titre, filtres (lieu, reservable), tri
+    et pagination, plus la prochaine representation a venir de chaque
+    spectacle affiche (PID : "affichant le lieu et les prochaines dates
+    de representation").
+    """
+    shows = Show.objects.all()
+    title = 'Liste des spectacles'
 
-    shows_with_next = []
-    for show in shows:
-        shows_with_next.append({
+    query = request.GET.get('q')
+    if query:
+        shows = shows.filter(title__icontains=query)
+        title = f"Résultats pour « {query} »"
+
+    location_id = request.GET.get('location')
+    if location_id:
+        shows = shows.filter(location_id=location_id)
+
+    bookable = request.GET.get('bookable')
+    if bookable in ('1', '0'):
+        shows = shows.filter(bookable=(bookable == '1'))
+
+    sort_fields = {
+        'title': 'title',
+        'location': 'location__designation',
+        'bookable': 'bookable',
+        'price': 'price',
+    }
+    sort = request.GET.get('sort', 'title')
+    shows = shows.order_by(sort_fields.get(sort, 'title'))
+
+    paginator = Paginator(shows, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    shows_with_next = [
+        {
             'show': show,
             'next_representation': show.representations.filter(schedule__gte=timezone.now()).order_by('schedule').first(),
-        })
+        }
+        for show in page_obj
+    ]
 
-    return render(request, 'index.html', {
+    return {
+        'shows': page_obj,
         'shows_with_next': shows_with_next,
-    })
+        'title': title,
+        'query': query or '',
+        'locations': Location.objects.all(),
+        'selected_location': location_id or '',
+        'selected_bookable': bookable or '',
+        'sort': sort,
+    }
+
+
+# Create your views here.
+def index(request):
+    return render(request, 'index.html', _shows_catalog_context(request))
+
 
 def contact(request):
     return render(request, 'contact.html')
@@ -402,43 +448,7 @@ def location_delete(request, id):
 # --- Show ---
 
 def show_index(request):
-    shows = Show.objects.all()
-    title = 'Liste des spectacles'
-
-    query = request.GET.get('q')
-    if query:
-        shows = shows.filter(title__icontains=query)
-        title = f"Résultats pour « {query} »"
-
-    location_id = request.GET.get('location')
-    if location_id:
-        shows = shows.filter(location_id=location_id)
-
-    bookable = request.GET.get('bookable')
-    if bookable in ('1', '0'):
-        shows = shows.filter(bookable=(bookable == '1'))
-
-    sort_fields = {
-        'title': 'title',
-        'location': 'location__designation',
-        'bookable': 'bookable',
-        'price': 'price',
-    }
-    sort = request.GET.get('sort', 'title')
-    shows = shows.order_by(sort_fields.get(sort, 'title'))
-
-    paginator = Paginator(shows, 10)
-    page_obj = paginator.get_page(request.GET.get('page'))
-
-    return render(request, 'show/index.html', {
-        'shows': page_obj,
-        'title': title,
-        'query': query or '',
-        'locations': Location.objects.all(),
-        'selected_location': location_id or '',
-        'selected_bookable': bookable or '',
-        'sort': sort,
-    })
+    return render(request, 'show/index.html', _shows_catalog_context(request))
 
 
 def show_show(request, id):
