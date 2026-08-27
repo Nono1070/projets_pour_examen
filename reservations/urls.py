@@ -76,6 +76,10 @@ urlpatterns = [
 
     path('producteur/', views.producer_dashboard, name='producer_dashboard'),
 
+    path('devenir/<str:role>/', views.role_request_create, name='role_request_create'),
+    path('demandes-role/<int:id>/approuver/', views.role_request_approve, name='role_request_approve'),
+    path('demandes-role/<int:id>/refuser/', views.role_request_reject, name='role_request_reject'),
+
     path('api/artists/', ArtistListCreateView.as_view(), name='artist-api-list'),
     path('api/artists/<int:pk>/', ArtistRetrieveUpdateDestroyView.as_view(), name='artist-api-detail'),
     path('api/shows/', ShowListView.as_view(), name='show-api-list'),

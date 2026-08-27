@@ -36,4 +36,37 @@
         <a href="{% url 'reservations:review_create' %}">Poster une critique</a> |
         <a href="{% url 'reservations:press_article_index' %}">Voir les articles de presse</a>
     </p>
+
+    <h3>Rôles</h3>
+    <ul>
+        {% if is_critic %}
+        <li>Vous êtes critique de presse.</li>
+        {% elif critic_request_pending %}
+        <li>Demande "Critique de presse" en attente de validation.</li>
+        {% else %}
+        <li><a href="{% url 'reservations:role_request_create' 'CRITIC' %}">Devenir critique de presse</a></li>
+        {% endif %}
+
+        {% if is_producer %}
+        <li>Vous êtes producteur. <a href="{% url 'reservations:producer_dashboard' %}">Accéder à l'espace producteur</a></li>
+        {% elif producer_request_pending %}
+        <li>Demande "Producteur" en attente de validation.</li>
+        {% else %}
+        <li><a href="{% url 'reservations:role_request_create' 'PRODUCER' %}">Devenir producteur</a></li>
+        {% endif %}
+    </ul>
+
+    {% if my_role_requests %}
+    <h4>Mes demandes</h4>
+    <table border="1" cellspacing="0">
+        <tr><th>Rôle</th><th>Statut</th><th>Envoyée le</th></tr>
+        {% for role_request in my_role_requests %}
+        <tr>
+            <td>{{ role_request.get_role_display }}</td>
+            <td>{{ role_request.get_status_display }}</td>
+            <td>{{ role_request.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 {% endblock %}

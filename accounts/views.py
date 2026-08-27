@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.db.models import Sum, F
 
-from reservations.models import Reservation, Review, PressArticle, UserMeta
+from reservations.models import Reservation, Review, PressArticle, UserMeta, RoleRequest
 
 from .forms import UserSignUpForm, UserUpdateForm
 
@@ -59,6 +59,11 @@ def profile(request):
         total_spent=Sum(F('quantity') * F('price')),
     )
 
+    user_groups = set(request.user.groups.values_list('name', flat=True))
+    pending_roles = set(RoleRequest.objects.filter(
+        user=request.user, status=RoleRequest.Status.PENDING,
+    ).values_list('role', flat=True))
+
     return render(request, 'user/profile.html', {
         "user_language": user_language,
         "reservations_count": Reservation.objects.filter(user=request.user).count(),
@@ -66,6 +71,11 @@ def profile(request):
         "reservations_total_spent": reservations_stats['total_spent'] or 0,
         "reviews_count": Review.objects.filter(user=request.user).count(),
         "press_articles_count": PressArticle.objects.filter(critic=request.user).count(),
+        "is_critic": 'CRITIC' in user_groups,
+        "is_producer": 'PRODUCER' in user_groups,
+        "critic_request_pending": 'CRITIC' in pending_roles,
+        "producer_request_pending": 'PRODUCER' in pending_roles,
+        "my_role_requests": RoleRequest.objects.filter(user=request.user).order_by('-created_at'),
     })
 
 

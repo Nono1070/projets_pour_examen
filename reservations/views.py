@@ -6,17 +6,21 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models import Sum, F
 from django.utils import timezone
 
-from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle
+from .models import Artist, Type, Locality, Location, Show, Representation, Review, Reservation, PressArticle, RoleRequest
 from .forms import ArtistForm, TypeForm, LocalityForm, LocationForm, ShowForm, RepresentationForm, ReviewForm, ReservationForm, PressArticleForm
 from .webservice import sync_shows_from_webservice, WebserviceSyncError
 
 
 def is_admin(user):
     return user.is_superuser or user.groups.filter(name='ADMIN').exists()
+
+
+def is_producer(user):
+    return user.groups.filter(name='PRODUCER').exists()
 
 
 COOKIE_CONSENT_NAME = 'cookie_consent'
@@ -818,6 +822,7 @@ def dashboard(request):
             'members': User.objects.count(),
         },
         'pending_reviews': Review.objects.filter(validated=False).order_by('-created_at')[:10],
+        'pending_role_requests': RoleRequest.objects.filter(status=RoleRequest.Status.PENDING),
     })
 
 
@@ -1023,3 +1028,70 @@ def producer_dashboard(request):
         'pending_reviews': Review.objects.filter(show__producer=request.user, validated=False),
         'pending_articles': PressArticle.objects.filter(show__producer=request.user, published=False),
     })
+
+
+# --- Demandes de role (CRITIC / PRODUCER) ---
+
+@login_required
+def role_request_create(request, role):
+    if role not in RoleRequest.Role.values:
+        messages.error(request, "Rôle inconnu.")
+        return redirect('accounts:user-profile')
+
+    if request.user.groups.filter(name=role).exists():
+        messages.error(request, "Vous avez déjà ce rôle.")
+        return redirect('accounts:user-profile')
+
+    if RoleRequest.objects.filter(user=request.user, role=role, status=RoleRequest.Status.PENDING).exists():
+        messages.error(request, "Vous avez déjà une demande en attente pour ce rôle.")
+        return redirect('accounts:user-profile')
+
+    if request.method == 'POST':
+        RoleRequest.objects.create(
+            user=request.user,
+            role=role,
+            message=request.POST.get('message', ''),
+        )
+        messages.success(request, "Demande envoyée, en attente de validation par l'administrateur.")
+
+        return redirect('accounts:user-profile')
+
+    return render(request, 'role_request/create.html', {
+        'role': role,
+        'role_label': dict(RoleRequest.Role.choices).get(role),
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def role_request_approve(request, id):
+    role_request = get_object_or_404(RoleRequest, id=id, status=RoleRequest.Status.PENDING)
+
+    if request.method == 'POST':
+        group = Group.objects.get(name=role_request.role)
+        group.user_set.add(role_request.user)
+
+        role_request.status = RoleRequest.Status.APPROVED
+        role_request.reviewed_by = request.user
+        role_request.reviewed_at = timezone.now()
+        role_request.save()
+
+        messages.success(request, f"Demande de {role_request.user.username} approuvée.")
+
+    return redirect('reservations:dashboard')
+
+
+@login_required
+@user_passes_test(is_admin)
+def role_request_reject(request, id):
+    role_request = get_object_or_404(RoleRequest, id=id, status=RoleRequest.Status.PENDING)
+
+    if request.method == 'POST':
+        role_request.status = RoleRequest.Status.REJECTED
+        role_request.reviewed_by = request.user
+        role_request.reviewed_at = timezone.now()
+        role_request.save()
+
+        messages.success(request, f"Demande de {role_request.user.username} refusée.")
+
+    return redirect('reservations:dashboard')

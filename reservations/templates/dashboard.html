@@ -72,4 +72,30 @@
     {% else %}
     <p>Aucune critique en attente.</p>
     {% endif %}
+
+    <h3>Demandes de rôle en attente</h3>
+    {% if pending_role_requests %}
+    <table border="1" cellspacing="0">
+        <tr><th>Membre</th><th>Rôle demandé</th><th>Message</th><th>Actions</th></tr>
+        {% for role_request in pending_role_requests %}
+        <tr>
+            <td>{{ role_request.user.username }}</td>
+            <td>{{ role_request.get_role_display }}</td>
+            <td>{{ role_request.message }}</td>
+            <td>
+                <form method="post" action="{% url 'reservations:role_request_approve' role_request.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Approuver</button>
+                </form>
+                <form method="post" action="{% url 'reservations:role_request_reject' role_request.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Refuser</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucune demande en attente.</p>
+    {% endif %}
 {% endblock %}
